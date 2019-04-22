@@ -1,0 +1,11 @@
+version: 0.1
+phases:
+  pre_build:
+    commands:
+      - npm install
+  build:
+    commands:
+      - npm build
+artifacts:
+  files:
+    - 'build/server.js'
