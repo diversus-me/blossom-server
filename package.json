@@ -6,14 +6,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon --exec babel-node server.js",
-    "build": "babel server.js --out-file build/server.js"
+    "build": "babel src/server.js --out-file build/server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.16.4",
-    "pg-promise": "^8.6.5"
+    "pg-promise": "^8.6.5",
+    "sequelize": "^5.7.5"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
