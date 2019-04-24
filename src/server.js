@@ -1,5 +1,5 @@
 import express from 'express'
-import sequelize, { Sequelize } from 'sequelize'
+import Sequelize from 'sequelize'
 
 // const pgp = require('pg-promise')()
 // const connection = {}
