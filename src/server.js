@@ -27,7 +27,7 @@ const db = new Sequelize(
   }
 )
 
-sequelize
+db
   .authenticate()
   .then(() => {
     console.log('Connection to database established.');
