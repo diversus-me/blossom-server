@@ -1,33 +1,16 @@
 import express from 'express'
-import Sequelize from 'sequelize'
 
-// const pgp = require('pg-promise')()
-// const connection = {}
+import connectPostgres from './postgres/connectPostgres'
+import initPostgres from './postgres/initPostgres'
+import initializeSessions from './sessions/initializeSessions'
+import defineAPI from './defineAPI'
 
-// if (process.env.NODE_ENV === 'production') {
-//   const connection = {
-//     host: process.env.RDS_HOSTNAME,
-//     port: process.env.RDS_PORT,
-//     database: process.env.RDS_DB_NAME,
-//     user: process.env.RDS_USERNAME,
-//     password: process.env.RDS_PASSWORD
-//   }
-// }
+const PORT = process.env.HTTP_PORT || 8081
+const app = express()
 
-// const db = pgp(connection)
-
-const db = new Sequelize(
-  process.env.RDS_DB_NAME,
-  process.env.RDS_USERNAME,
-  process.env.RDS_PASSWORD,
-  {
-    host: process.env.RDS_HOSTNAME,
-    port: process.env.RDS_PORT,
-    dialect: 'postgres'
-  }
-)
-
-db
+/* Connect to Database */
+const postgres = connectPostgres()
+postgres
   .authenticate()
   .then(() => {
     console.log('Connection to database established.');
@@ -36,15 +19,13 @@ db
     console.error('Unable to connect to the database:', err);
   })
 
-const PORT = process.env.HTTP_PORT || 8081
-const app = express()
+/* Sync with Database */
+const models = initPostgres(postgres)
 
-app.get('/flowers', (req, res) => {
-  res.json({
-    name: 'Dandelion',
-    colour: 'Blue-ish'
-  })
-})
+initializeSessions(app)
+
+/* Initiate API */
+defineAPI(app, models)
 
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}.`)
