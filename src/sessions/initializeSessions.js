@@ -21,14 +21,26 @@ const options = {
 const DynamoDBStore = dynamoDB(session)
 
 export default function initializeSessions(app){
-    app.use(session({
-        store: new DynamoDBStore(options),
-        secret: process.env.cookieSecret,
-        resave: false,
-        saveUninitialized: true,
-        cookie: {
-            maxAge,
-        }
-
-    }))
+    if (process.env.NODE_ENV === 'production') {
+        app.use(session({
+            store: new DynamoDBStore(options),
+            secret: process.env.cookieSecret,
+            key: 'user_sid',
+            resave: false,
+            saveUninitialized: true,
+            cookie: {
+                maxAge,
+            }
+        }))
+    } else {
+        app.use(session({
+            secret: 'development',
+            key: 'user_sid',
+            resave: false,
+            saveUninitialized: true,
+            cookie: {
+                maxAge,
+            }
+        }))
+    }
 }

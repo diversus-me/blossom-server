@@ -26,6 +26,11 @@ function initDatabase(database) {
     joined: {
       type: _sequelize["default"].DATE,
       defaultValue: _sequelize["default"].NOW
+    },
+    role: {
+      type: _sequelize["default"].STRING,
+      defaultValue: 'user',
+      allowNull: false
     }
   });
   var Flower = database.define('flower', {
@@ -44,10 +49,6 @@ function initDatabase(database) {
   });
   var Node = database.define('node', {
     title: {
-      type: _sequelize["default"].STRING,
-      allowNull: false
-    },
-    type: {
       type: _sequelize["default"].STRING,
       allowNull: false
     },
@@ -72,47 +73,62 @@ function initDatabase(database) {
   });
   var Connection = database.define('connection', {
     sourceIn: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize["default"].INTEGER,
       allowNull: false
     },
     sourceOut: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize["default"].INTEGER,
+      allowNull: false
+    },
+    sourceLength: {
+      type: _sequelize["default"].INTEGER,
       allowNull: false
     },
     targetIn: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize["default"].INTEGER,
       allowNull: false
     },
     targetOut: {
+      type: _sequelize["default"].INTEGER,
+      allowNull: false
+    },
+    created: {
+      type: _sequelize["default"].DATE,
+      defaultValue: _sequelize["default"].NOW
+    },
+    flavor: {
       type: _sequelize["default"].STRING,
       allowNull: false
     }
-  });
-  database.sync({
-    force: true
-  });
+  }); // database.sync({force: true})
+
+  database.sync();
   Flower.belongsTo(User);
   Flower.belongsTo(Node);
   Node.belongsTo(User);
+  Node.belongsTo(Video);
   Node.hasMany(Connection, {
     as: 'connections'
   });
+  Connection.belongsTo(Node);
   Connection.belongsTo(Node, {
-    as: 'sourceVideo'
+    as: 'targetNode'
   });
-  Connection.belongsTo(Node, {
-    as: 'targetVideo'
-  });
+  Connection.belongsTo(User);
   Video.belongsTo(User);
   User.hasMany(Node, {
-    as: 'nodes'
+    as: 'Nodes'
   });
   User.hasMany(Flower, {
-    as: 'flowers'
+    as: 'Flowers'
   });
   User.hasMany(Video, {
-    as: 'videos'
+    as: 'Videos'
   });
+  User.hasMany(Connection, {
+    as: 'Connections'
+  });
+  database.sync();
   return {
     Flower: Flower,
     Node: Node,

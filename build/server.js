@@ -2,6 +2,8 @@
 
 var _express = _interopRequireDefault(require("express"));
 
+var _cors = _interopRequireDefault(require("cors"));
+
 var _connectPostgres = _interopRequireDefault(require("./postgres/connectPostgres"));
 
 var _initPostgres = _interopRequireDefault(require("./postgres/initPostgres"));
@@ -25,7 +27,17 @@ postgres.authenticate().then(function () {
 /* Sync with Database */
 
 var models = (0, _initPostgres["default"])(postgres);
+
+var getVideoId = require('get-video-id');
+
+console.log(getVideoId('test'));
 (0, _initializeSessions["default"])(app);
+app.use((0, _cors["default"])({
+  credentials: true,
+  origin: "".concat(process.env.HOST)
+}));
+app.use(_express["default"].json());
+app.use(_express["default"].urlencoded());
 /* Initiate API */
 
 (0, _defineAPI["default"])(app, models);

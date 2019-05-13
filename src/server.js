@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 
 import connectPostgres from './postgres/connectPostgres'
 import initPostgres from './postgres/initPostgres'
@@ -22,7 +23,16 @@ postgres
 /* Sync with Database */
 const models = initPostgres(postgres)
 
+const getVideoId = require('get-video-id')
+
+console.log(getVideoId('test'))
+
 initializeSessions(app)
+
+app.use(cors({credentials: true, origin: `${process.env.HOST}`}))
+
+app.use(express.json())
+app.use(express.urlencoded())
 
 /* Initiate API */
 defineAPI(app, models)

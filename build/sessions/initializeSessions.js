@@ -28,13 +28,26 @@ var options = {
 var DynamoDBStore = (0, _connectDynamodb["default"])(_expressSession["default"]);
 
 function initializeSessions(app) {
-  app.use((0, _expressSession["default"])({
-    store: new DynamoDBStore(options),
-    secret: process.env.cookieSecret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      maxAge: maxAge
-    }
-  }));
+  if (process.env.NODE_ENV === 'production') {
+    app.use((0, _expressSession["default"])({
+      store: new DynamoDBStore(options),
+      secret: process.env.cookieSecret,
+      key: 'user_sid',
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        maxAge: maxAge
+      }
+    }));
+  } else {
+    app.use((0, _expressSession["default"])({
+      secret: 'development',
+      key: 'user_sid',
+      resave: false,
+      saveUninitialized: true,
+      cookie: {
+        maxAge: maxAge
+      }
+    }));
+  }
 }

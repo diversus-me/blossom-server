@@ -15,8 +15,13 @@ export default function initDatabase(database) {
             }
         },
         joined: {
-            type:Sequelize.DATE,
+            type: Sequelize.DATE,
             defaultValue: Sequelize.NOW
+        },
+        role: {
+            type: Sequelize.STRING,
+            defaultValue: 'user',
+            allowNull: false
         }
     })
 
@@ -37,10 +42,6 @@ export default function initDatabase(database) {
 
     const Node = database.define('node', {
         title: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        type: {
             type: Sequelize.STRING,
             allowNull: false
         },
@@ -67,39 +68,57 @@ export default function initDatabase(database) {
 
     const Connection = database.define('connection', {
         sourceIn: {
-            type: Sequelize.STRING,
+            type: Sequelize.INTEGER,
             allowNull: false
           },
           sourceOut: {
-              type: Sequelize.STRING,
+              type: Sequelize.INTEGER,
               allowNull: false
           },
+          sourceLength: {
+              type: Sequelize.INTEGER,
+              allowNull: false,
+          },
           targetIn: {
-              type: Sequelize.STRING,
+              type: Sequelize.INTEGER,
               allowNull: false
           },
           targetOut: {
-              type: Sequelize.STRING,
+              type: Sequelize.INTEGER,
               allowNull: false
+          },
+          created: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.NOW
+          },
+          flavor: {
+            type: Sequelize.STRING,
+            allowNull: false
           }
     })
 
-    database.sync({ force: true })
+    // database.sync({force: true})
+    database.sync()
 
     Flower.belongsTo(User)
     Flower.belongsTo(Node)
 
     Node.belongsTo(User)
+    Node.belongsTo(Video)
     Node.hasMany(Connection, {as: 'connections'})
 
-    Connection.belongsTo(Node, {as: 'sourceVideo'})
-    Connection.belongsTo(Node, {as: 'targetVideo'})
+    Connection.belongsTo(Node)
+    Connection.belongsTo(Node, {as: 'targetNode'})
+    Connection.belongsTo(User)
 
     Video.belongsTo(User)
 
-    User.hasMany(Node, {as: 'nodes'})
-    User.hasMany(Flower, {as: 'flowers'})
-    User.hasMany(Video, {as: 'videos'})
+    User.hasMany(Node, {as: 'Nodes'})
+    User.hasMany(Flower, {as: 'Flowers'})
+    User.hasMany(Video, {as: 'Videos'})
+    User.hasMany(Connection, {as: 'Connections'})
+
+    database.sync()
 
     return { Flower, Node, Connection, User, Video }
 }
