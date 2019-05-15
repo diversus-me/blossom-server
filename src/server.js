@@ -29,14 +29,22 @@ console.log(getVideoId('test'))
 
 initializeSessions(app)
 
+const whitelist = [
+  `${process.env.HOST}`,
+  'https://flower.dev.diversus.me',
+  'https://flower.diversus.me',
+  'https://flowerblossom-dev.netlify.com'
+]
+
 app.use(cors({
   credentials: true,
-  origin: [
-    `${process.env.HOST}`,
-    'https://flower.dev.diversus.me',
-    'https://flower.diversus.me',
-    'https://flowerblossom-dev.netlify.com'
-  ]
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
 }))
 
 app.use(express.json())
