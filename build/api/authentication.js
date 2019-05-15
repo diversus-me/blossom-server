@@ -39,11 +39,16 @@ function loginLink(app, models) {
   app.post('/api/requestLoginLink', (0, _check.checkSchema)({
     email: {
       isEmail: true,
-      errorMessage: 'Invalid Email'
+      errorMessage: 'Invalid email'
     }
   }), function (req, res) {
     var email = req.body.email;
     var errors = (0, _check.validationResult)(req);
+    var host = getHost(req);
+
+    if (!host) {
+      return res.status(403).jsonp(errors.array());
+    }
 
     if (!errors.isEmpty()) {
       return res.status(422).jsonp(errors.array());
@@ -57,7 +62,7 @@ function loginLink(app, models) {
           var token = generateToken(email);
           var mailOptions = {
             from: 'login@diversus.me',
-            html: (0, _htmlTemplate["default"])("".concat(process.env.HOST, "/?token=").concat(token)),
+            html: (0, _htmlTemplate["default"])("".concat(host, "/?token=").concat(token)),
             subject: 'Login',
             to: email
           };
@@ -163,4 +168,18 @@ function generateToken(email) {
     email: email,
     expiration: date
   }, process.env.JWT_SECRET);
+} //TODO correctly handle possible hosts for development and production
+
+
+var hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com']; //TODO not secure!!!
+
+function getHost(req) {
+  var host = req.headers.origin;
+  console.log(host);
+
+  if (hosts.indexOf(host) > -1) {
+    return host;
+  } else {
+    return false;
+  }
 }

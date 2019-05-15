@@ -32,9 +32,16 @@ var getVideoId = require('get-video-id');
 
 console.log(getVideoId('test'));
 (0, _initializeSessions["default"])(app);
+var whitelist = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
 app.use((0, _cors["default"])({
   credentials: true,
-  origin: "".concat(process.env.HOST)
+  origin: function origin(_origin, callback) {
+    if (whitelist.indexOf(_origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 }));
 app.use(_express["default"].json());
 app.use(_express["default"].urlencoded());
