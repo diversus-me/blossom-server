@@ -29,7 +29,15 @@ console.log(getVideoId('test'))
 
 initializeSessions(app)
 
-app.use(cors({credentials: true, origin: `${process.env.HOST}`}))
+app.use(cors({
+  credentials: true,
+  origin: [
+    `${process.env.HOST}`,
+    'https://flower.dev.diversus.me',
+    'https://flower.diversus.me',
+    'https://flowerblossom-dev.netlify.com'
+  ]
+}))
 
 app.use(express.json())
 app.use(express.urlencoded())

@@ -27,12 +27,18 @@ export function loginLink(app, models) {
     app.post('/api/requestLoginLink', checkSchema({
         email: {
            isEmail: true,
-           errorMessage: 'Invalid Email' 
+           errorMessage: 'Invalid email' 
         }
     }), (req, res) => {
         const { email } = req.body
 
         const errors = validationResult(req)
+
+        const host = getHost(req)
+
+        if (!host) {
+            return res.status(403).jsonp(errors.array())
+        }
 
         if (!errors.isEmpty()) {
             return res.status(422).jsonp(errors.array())
@@ -44,7 +50,7 @@ export function loginLink(app, models) {
                     const token = generateToken(email)
                     const mailOptions = {
                         from: 'login@diversus.me',
-                        html: htmlTemplate(`${process.env.HOST}/?token=${token}`),
+                        html: htmlTemplate(`${host}/?token=${token}`),
                         subject: 'Login',
                         to: email
                     }
@@ -117,4 +123,23 @@ function generateToken(email) {
     const date = new Date()
     date.setMinutes(date.getMinutes() + 15)
     return jwt.sign({ email, expiration: date }, process.env.JWT_SECRET)
+}
+
+//TODO correctly handle possible hosts for development and production
+const hosts = [
+    `${process.env.HOST}`,
+    'https://flower.dev.diversus.me',
+    'https://flower.diversus.me',
+    'https://flowerblossom-dev.netlify.com'
+  ]
+
+//TODO not secure!!!
+function getHost(req) {
+    const host = req.headers.origin
+    console.log(host)
+    if (hosts.indexOf(host) > -1) {
+        return host
+    } else {
+        return false
+    }
 }
