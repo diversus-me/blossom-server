@@ -254,6 +254,9 @@ export function addNode (app, models) {
                     })
                 })
               }
+            }).catch((error) => {
+              console.log(error)
+              return res.status(424).send('Video not found')
             })
         }
       })
