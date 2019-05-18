@@ -69,6 +69,10 @@ function initDatabase(database) {
     type: {
       type: _sequelize["default"].STRING,
       allowNull: false
+    },
+    duration: {
+      type: _sequelize["default"].INTEGER,
+      allowNull: false
     }
   });
   var Connection = database.define('connection', {
@@ -77,10 +81,6 @@ function initDatabase(database) {
       allowNull: false
     },
     sourceOut: {
-      type: _sequelize["default"].INTEGER,
-      allowNull: false
-    },
-    sourceLength: {
       type: _sequelize["default"].INTEGER,
       allowNull: false
     },
@@ -100,7 +100,7 @@ function initDatabase(database) {
       type: _sequelize["default"].STRING,
       allowNull: false
     }
-  }); // database.sync({force: true})
+  }); // database.sync({ force: true })
 
   database.sync();
   Flower.belongsTo(User);

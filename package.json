@@ -19,15 +19,26 @@
     "express-validator": "^5.3.1",
     "get-video-id": "^3.1.1",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "moment-duration-format": "^2.2.2",
+    "node-fetch": "^2.6.0",
     "nodemailer": "^6.1.1",
     "pg-promise": "^8.6.5",
-    "sequelize": "^5.7.5"
+    "sequelize": "^5.7.5",
+    "youtube-api": "^2.0.10"
   },
   "devDependencies": {
     "@babel/cli": "^7.4.3",
     "@babel/core": "^7.4.3",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.4.3",
-    "nodemon": "^1.18.11"
+    "nodemon": "^1.18.11",
+    "standard": "^12.0.1"
+  },
+  "standard": {
+    "env": [
+      "es6",
+      "node"
+    ]
   }
 }

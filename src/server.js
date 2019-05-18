@@ -14,18 +14,14 @@ const postgres = connectPostgres()
 postgres
   .authenticate()
   .then(() => {
-    console.log('Connection to database established.');
+    console.log('Connection to database established.')
   })
   .catch(err => {
-    console.error('Unable to connect to the database:', err);
+    console.error('Unable to connect to the database:', err)
   })
 
 /* Sync with Database */
 const models = initPostgres(postgres)
-
-const getVideoId = require('get-video-id')
-
-console.log(getVideoId('test'))
 
 initializeSessions(app)
 

@@ -8,6 +8,14 @@ exports.addNode = addNode;
 
 var _check = require("express-validator/check");
 
+var _nodeFetch = _interopRequireDefault(require("node-fetch"));
+
+var _moment = _interopRequireDefault(require("moment"));
+
+var _momentDurationFormat = _interopRequireDefault(require("moment-duration-format"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 var getVideoId = require('get-video-id');
 
 function createFlower(app, models) {
@@ -65,47 +73,66 @@ function createFlower(app, models) {
     if (!errors.isEmpty()) {
       console.log(errors.array());
       return res.status(422).jsonp(errors.array());
-    } else {
-      var _req$body = req.body,
-          title = _req$body.title,
-          description = _req$body.description,
-          type = _req$body.type,
-          link = _req$body.link;
-      models.User.findOne({
-        where: {
-          id: req.session.userID
-        }
-      }).then(function (user) {
-        if (!user) {
-          return res.status(404).send('User not found.');
-        } else {
-          models.Video.create({
-            type: type,
-            userId: user.get('id'),
-            url: getVideoId(link).id
-          }).then(function (video) {
-            models.Node.create({
-              title: title,
-              videoId: video.get('id'),
+    }
+
+    var _req$body = req.body,
+        title = _req$body.title,
+        description = _req$body.description,
+        type = _req$body.type,
+        link = _req$body.link;
+    models.User.findOne({
+      where: {
+        id: req.session.userID
+      }
+    }).then(function (user) {
+      if (!user) {
+        return res.status(404).send('User not found.');
+      } else {
+        var vidId = getVideoId(link).id;
+        (0, _nodeFetch["default"])("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=".concat(vidId, "&key=").concat(process.env.YOUTUBE_API_KEY)).then(checkStatus).then(function (body) {
+          console.log(body.items[0].contentDetails.duration);
+
+          if (!body.items[0]) {
+            throw Error('Video not found');
+          } else {
+            var duration = body.items[0].contentDetails.duration;
+
+            var parsedDuration = _moment["default"].duration(duration).format('s', {
+              trim: false,
+              useGrouping: false
+            });
+
+            models.Video.create({
+              type: type,
               userId: user.get('id'),
-              created: new Date()
-            }).then(function (node) {
-              models.Flower.create({
+              url: vidId,
+              duration: parsedDuration
+            }).then(function (video) {
+              models.Node.create({
                 title: title,
-                description: description,
+                videoId: video.get('id'),
                 userId: user.get('id'),
-                nodeId: node.get('id'),
                 created: new Date()
-              }).then(function (flower) {
-                return res.status(200).send({
-                  message: 'Flower was created'
+              }).then(function (node) {
+                models.Flower.create({
+                  title: title,
+                  description: description,
+                  userId: user.get('id'),
+                  nodeId: node.get('id'),
+                  created: new Date()
+                }).then(function (flower) {
+                  return res.status(200).send({
+                    message: 'Flower was created'
+                  });
                 });
               });
             });
-          });
-        }
-      });
-    }
+          }
+        })["catch"](function () {
+          return res.status(424).send('Video not found');
+        });
+      }
+    });
   });
 }
 
@@ -180,15 +207,6 @@ function addNode(app, models) {
         errorMessage: 'SourceOut is empty'
       }
     },
-    sourceLength: {
-      isInt: {
-        errorMessage: 'SourceLength is not an integer.'
-      },
-      isEmpty: {
-        negated: true,
-        errorMessage: 'SourceLength is empty'
-      }
-    },
     flavor: {
       isString: {
         errorMessage: 'Flavor is not a string'
@@ -227,7 +245,6 @@ function addNode(app, models) {
           title = _req$body2.title,
           type = _req$body2.type,
           link = _req$body2.link,
-          sourceLength = _req$body2.sourceLength,
           sourceIn = _req$body2.sourceIn,
           sourceOut = _req$body2.sourceOut,
           targetIn = _req$body2.targetIn,
@@ -241,37 +258,60 @@ function addNode(app, models) {
         if (!user) {
           return res.status(404).send('User not found.');
         } else {
-          models.Video.create({
-            type: type,
-            userId: user.get('id'),
-            url: getVideoId(link).id
-          }).then(function (video) {
-            models.Node.create({
-              title: title,
-              videoId: video.get('id'),
-              userId: user.get('id'),
-              created: new Date()
-            }).then(function (node) {
-              models.Connection.create({
-                sourceIn: sourceIn,
-                sourceOut: sourceOut,
-                targetIn: targetIn,
-                targetOut: targetOut,
-                sourceLength: sourceLength,
-                flavor: flavor,
+          var vidId = getVideoId(link).id;
+          (0, _nodeFetch["default"])("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=".concat(vidId, "&key=").concat(process.env.YOUTUBE_API_KEY, "k")).then(checkStatus).then(function (body) {
+            if (!body.items[0]) {
+              throw Error('Video not found');
+            } else {
+              var duration = body.items[0].contentDetails.duration;
+
+              var parsedDuration = _moment["default"].duration(duration).format('s', {
+                trim: false,
+                useGrouping: false
+              });
+
+              models.Video.create({
+                type: type,
                 userId: user.get('id'),
-                targetNodeId: node.get('id'),
-                nodeId: id,
-                created: new Date()
-              }).then(function (connection) {
-                return res.status(200).send({
-                  message: 'Node was created'
+                url: vidId,
+                duration: parsedDuration
+              }).then(function (video) {
+                models.Node.create({
+                  title: title,
+                  videoId: video.get('id'),
+                  userId: user.get('id'),
+                  created: new Date()
+                }).then(function (node) {
+                  models.Connection.create({
+                    sourceIn: sourceIn,
+                    sourceOut: sourceOut,
+                    targetIn: targetIn,
+                    targetOut: targetOut,
+                    flavor: flavor,
+                    userId: user.get('id'),
+                    targetNodeId: node.get('id'),
+                    nodeId: id,
+                    created: new Date()
+                  }).then(function (connection) {
+                    return res.status(200).send({
+                      message: 'Node was created'
+                    });
+                  });
                 });
               });
-            });
+            }
           });
         }
       });
     }
   });
+}
+
+function checkStatus(res) {
+  if (res.ok) {
+    // res.status >= 200 && res.status < 300
+    return res.json();
+  } else {
+    throw Error('Connection Fail');
+  }
 }

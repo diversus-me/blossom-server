@@ -27,10 +27,6 @@ postgres.authenticate().then(function () {
 /* Sync with Database */
 
 var models = (0, _initPostgres["default"])(postgres);
-
-var getVideoId = require('get-video-id');
-
-console.log(getVideoId('test'));
 (0, _initializeSessions["default"])(app);
 var whitelist = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
 app.use((0, _cors["default"])({

@@ -31,7 +31,7 @@ transporter.verify(function (error, success) {
   if (error) {
     console.log(error);
   } else {
-    console.log("Server is ready to take our messages");
+    console.log('Server is ready to take our messages');
   }
 });
 
@@ -100,7 +100,7 @@ function login(app, models) {
 
       try {
         decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET);
-      } catch (_unused) {
+      } catch (e) {
         return res.status(403).send({
           message: 'Token incorrect.'
         });
@@ -168,10 +168,10 @@ function generateToken(email) {
     email: email,
     expiration: date
   }, process.env.JWT_SECRET);
-} //TODO correctly handle possible hosts for development and production
+} // TODO correctly handle possible hosts for development and production
 
 
-var hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com']; //TODO not secure!!!
+var hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com']; // TODO not secure!!!
 
 function getHost(req) {
   var host = req.headers.origin;
