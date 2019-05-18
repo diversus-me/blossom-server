@@ -217,7 +217,7 @@ export function addNode (app, models) {
           return res.status(404).send('User not found.')
         } else {
           const vidId = getVideoId(link).id
-          fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}k`)
+          fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
             .then(checkStatus)
             .then(body => {
               if (!body.items[0]) {

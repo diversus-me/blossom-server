@@ -259,7 +259,7 @@ function addNode(app, models) {
           return res.status(404).send('User not found.');
         } else {
           var vidId = getVideoId(link).id;
-          (0, _nodeFetch["default"])("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=".concat(vidId, "&key=").concat(process.env.YOUTUBE_API_KEY, "k")).then(checkStatus).then(function (body) {
+          (0, _nodeFetch["default"])("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=".concat(vidId, "&key=").concat(process.env.YOUTUBE_API_KEY)).then(checkStatus).then(function (body) {
             if (!body.items[0]) {
               throw Error('Video not found');
             } else {
