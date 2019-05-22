@@ -4,7 +4,8 @@
   "description": "",
   "main": "./build/server.js",
   "scripts": {
-    "test": "standard",
+    "lint": "standard",
+    "test": "npm run lint",
     "start": "nodemon --exec babel-node src/server.js",
     "build": "babel src --out-dir build"
   },

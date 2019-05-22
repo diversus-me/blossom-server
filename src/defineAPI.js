@@ -3,7 +3,6 @@ import { loginLink, login, checkLogin } from './api/authentication'
 import { createFlower, addNode } from './api/flower'
 import fetch from 'node-fetch'
 import moment from 'moment'
-import momentDurationFormat from 'moment-duration-format'
 const getVideoId = require('get-video-id')
 
 function checkAuth (req, res, next) {
