@@ -11,6 +11,13 @@ For more information on this project, please visit [diversus.me](https://www.div
 
 ### Installation & Development
 
+#### Configuration
+Copy .env.example to .env
+```
+> cp .env.example .env
+```
+Add values according to your local dev environment
+
 #### Database
 Create a passwordless PostgreSQL database running on port 5432 called *blossom-dev*.
 
@@ -27,5 +34,5 @@ EMAIL_PORT
 #### Node.js server
 ```
 npm install
-npm run start
+npm start
 ```
