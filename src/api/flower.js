@@ -1,7 +1,6 @@
 import { checkSchema, validationResult } from 'express-validator/check'
 import fetch from 'node-fetch'
 import moment from 'moment'
-import momentDurationFormat from 'moment-duration-format'
 const getVideoId = require('get-video-id')
 
 export function createFlower (app, models) {
