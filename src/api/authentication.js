@@ -5,25 +5,29 @@ import { checkSchema, validationResult } from 'express-validator/check'
 
 import htmlTemplate from './htmlTemplate'
 
-const transporter = nodemailer.createTransport({
-  auth: {
-    pass: process.env.EMAIL_PASSWORD,
-    user: process.env.EMAIL_USER
-  },
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false
-})
+export function generateTransporter () {
+  const transporter = nodemailer.createTransport({
+    auth: {
+      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_USER
+    },
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false
+  })
 
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log(error)
-  } else {
-    console.log('Server is ready to take our messages')
-  }
-})
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error)
+    } else {
+      console.log('Server is ready to take our messages')
+    }
+  })
 
-export function loginLink (app, models) {
+  return transporter
+}
+
+export function loginLink (app, models, transporter) {
   app.post('/api/requestLoginLink', checkSchema({
     email: {
       isEmail: true,
@@ -126,12 +130,18 @@ function generateToken (email) {
 }
 
 // TODO correctly handle possible hosts for development and production
-const hosts = [
-  `${process.env.HOST}`,
-  'https://flower.dev.diversus.me',
-  'https://flower.diversus.me',
-  'https://flowerblossom-dev.netlify.com'
-]
+let hosts = []
+
+if (process.env.NODE_ENV === 'production') {
+  hosts = [
+    `${process.env.HOST}`,
+    'https://flower.dev.diversus.me',
+    'https://flower.diversus.me',
+    'https://flowerblossom-dev.netlify.com'
+  ]
+} else {
+  hosts = ['http://localhost:3000']
+}
 
 // TODO not secure!!!
 function getHost (req) {

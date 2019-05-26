@@ -1,5 +1,5 @@
 import { createUser, deleteUser } from './api/user'
-import { loginLink, login, checkLogin } from './api/authentication'
+import { loginLink, login, checkLogin, generateTransporter } from './api/authentication'
 import { createFlower, addNode } from './api/flower'
 import fetch from 'node-fetch'
 import moment from 'moment'
@@ -95,8 +95,10 @@ export default function defineAPI (app, models) {
   //   })
   // })
 
+  const tranporter = generateTransporter()
+
   checkLogin(app, models)
-  loginLink(app, models)
+  loginLink(app, models, tranporter)
   login(app, models)
 
   createUser(app, models, checkAuth, checkAdmin)
