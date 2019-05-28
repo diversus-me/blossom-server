@@ -23,10 +23,10 @@ postgres
     console.error('Unable to connect to the database:', err)
   })
 
+initializeSessions(app)
+
 /* Sync with Database */
 const models = initPostgres(postgres)
-
-initializeSessions(app)
 
 const whitelist = [
   `${process.env.HOST}`,

@@ -100,7 +100,10 @@ export function createFlower (app, models) {
               })
             }
           })
-          .catch(() => res.status(424).send('Video not found'))
+          .catch((error) => {
+            console.log(error)
+            return res.status(424).send('Video not found')
+          })
       }
     })
   })
