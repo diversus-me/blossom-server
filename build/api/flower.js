@@ -12,8 +12,11 @@ var _nodeFetch = _interopRequireDefault(require("node-fetch"));
 
 var _moment = _interopRequireDefault(require("moment"));
 
+var _momentDurationFormat = _interopRequireDefault(require("moment-duration-format"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+// eslint-disable-line no-unused-vars
 var getVideoId = require('get-video-id');
 
 function createFlower(app, models) {
@@ -126,7 +129,8 @@ function createFlower(app, models) {
               });
             });
           }
-        })["catch"](function () {
+        })["catch"](function (error) {
+          console.log(error);
           return res.status(424).send('Video not found');
         });
       }

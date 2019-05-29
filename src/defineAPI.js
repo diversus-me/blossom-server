@@ -3,6 +3,7 @@ import { loginLink, login, checkLogin, generateTransporter } from './api/authent
 import { createFlower, addNode } from './api/flower'
 import fetch from 'node-fetch'
 import moment from 'moment'
+import momentDurationFormat from 'moment-duration-format' // eslint-disable-line no-unused-vars
 const getVideoId = require('get-video-id')
 
 function checkAuth (req, res, next) {
@@ -70,7 +71,10 @@ export default function defineAPI (app, models) {
           res.status(200).send({ duration: parsedDuration })
         }
       })
-      .catch(() => res.status(424).send('Video not found'))
+      .catch((error) => {
+        console.log(error)
+        return res.status(424).send('Video not found')
+      })
   })
 
   // app.get('/api/allFlowers', (req, res) => {

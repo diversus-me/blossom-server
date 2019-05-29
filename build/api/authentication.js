@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.generateTransporter = generateTransporter;
 exports.loginLink = loginLink;
 exports.login = login;
 exports.checkLogin = checkLogin;
@@ -17,25 +18,28 @@ var _htmlTemplate = _interopRequireDefault(require("./htmlTemplate"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var transporter = _nodemailer["default"].createTransport({
-  auth: {
-    pass: process.env.EMAIL_PASSWORD,
-    user: process.env.EMAIL_USER
-  },
-  host: process.env.EMAIL_HOST,
-  port: process.env.EMAIL_PORT,
-  secure: false
-});
+function generateTransporter() {
+  var transporter = _nodemailer["default"].createTransport({
+    auth: {
+      pass: process.env.EMAIL_PASSWORD,
+      user: process.env.EMAIL_USER
+    },
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false
+  });
 
-transporter.verify(function (error, success) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Server is ready to take our messages');
-  }
-});
+  transporter.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Server is ready to take our messages');
+    }
+  });
+  return transporter;
+}
 
-function loginLink(app, models) {
+function loginLink(app, models, transporter) {
   app.post('/api/requestLoginLink', (0, _check.checkSchema)({
     email: {
       isEmail: true,
@@ -171,7 +175,14 @@ function generateToken(email) {
 } // TODO correctly handle possible hosts for development and production
 
 
-var hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com']; // TODO not secure!!!
+var hosts = [];
+
+if (process.env.NODE_ENV === 'production') {
+  hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
+} else {
+  hosts = ['http://localhost:3000'];
+} // TODO not secure!!!
+
 
 function getHost(req) {
   var host = req.headers.origin;

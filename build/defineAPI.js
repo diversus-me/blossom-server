@@ -15,8 +15,11 @@ var _nodeFetch = _interopRequireDefault(require("node-fetch"));
 
 var _moment = _interopRequireDefault(require("moment"));
 
+var _momentDurationFormat = _interopRequireDefault(require("moment-duration-format"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+// eslint-disable-line no-unused-vars
 var getVideoId = require('get-video-id');
 
 function checkAuth(req, res, next) {
@@ -88,7 +91,8 @@ function defineAPI(app, models) {
           duration: parsedDuration
         });
       }
-    })["catch"](function () {
+    })["catch"](function (error) {
+      console.log(error);
       return res.status(424).send('Video not found');
     });
   }); // app.get('/api/allFlowers', (req, res) => {
@@ -113,8 +117,9 @@ function defineAPI(app, models) {
   //   })
   // })
 
+  var tranporter = (0, _authentication.generateTransporter)();
   (0, _authentication.checkLogin)(app, models);
-  (0, _authentication.loginLink)(app, models);
+  (0, _authentication.loginLink)(app, models, tranporter);
   (0, _authentication.login)(app, models);
   (0, _user.createUser)(app, models, checkAuth, checkAdmin);
   (0, _user.deleteUser)(app, models, checkAuth, checkAdmin);

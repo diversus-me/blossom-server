@@ -27,10 +27,10 @@ postgres.authenticate().then(function () {
 })["catch"](function (err) {
   console.error('Unable to connect to the database:', err);
 });
+(0, _initializeSessions["default"])(app);
 /* Sync with Database */
 
 var models = (0, _initPostgres["default"])(postgres);
-(0, _initializeSessions["default"])(app);
 var whitelist = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
 app.use((0, _cors["default"])({
   credentials: true,
