@@ -33,81 +33,90 @@ export function loginLink (app, models, transporter) {
       isEmail: true,
       errorMessage: 'Invalid email'
     }
-  }), (req, res) => {
-    const { email } = req.body
+  }), async (req, res) => {
+    try {
+      const { email } = req.body
 
-    const errors = validationResult(req)
+      const errors = validationResult(req)
 
-    const host = getHost(req)
+      const host = getHost(req)
 
-    if (!host) {
-      return res.status(403).jsonp(errors.array())
-    }
+      if (!host) {
+        return res.status(403).jsonp(errors.array())
+      }
 
-    if (!errors.isEmpty()) {
-      return res.status(422).jsonp(errors.array())
-    } else {
-      models.User.findOne({
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array())
+      }
+
+      const user = await models.User.findOne({
         where: { email }
-      }).then((user) => {
-        if (user) {
-          const token = generateToken(email)
-          const mailOptions = {
-            from: 'login@diversus.me',
-            html: htmlTemplate(`${host}/?token=${token}`),
-            subject: 'Login',
-            to: email
-          }
-          transporter.sendMail(mailOptions, error => {
-            if (error) {
-              return res.status(500).send({ error })
-            }
-            return res.status(200).send({ message: `Mail has been sent to ${email}` })
-          })
-        } else {
-          return res.status(404).send({ message: 'User does not exists}' })
-        }
       })
+
+      if (!user) {
+        return res.status(404).send({ message: 'User does not exists' })
+      }
+
+      const token = generateToken(email)
+      const mailOptions = {
+        from: 'login@diversus.me',
+        html: htmlTemplate(`${host}/?token=${token}`),
+        subject: 'Login',
+        to: email
+      }
+      transporter.sendMail(mailOptions, error => {
+        if (error) {
+          return res.status(500).send({ error })
+        }
+        return res.status(200).send({ message: `Mail has been sent to ${email}` })
+      })
+    } catch (error) {
+      return res.status(500).send('')
     }
   })
 }
 
 export function login (app, models) {
-  app.get('/api/login', (req, res) => {
-    const token = req.query.token
+  app.get('/api/login', async (req, res) => {
+    try {
+      const token = req.query.token
 
-    if (!token) {
-      return res.status(422).send({ message: 'No token specified.' })
-    } else {
+      if (!token) {
+        return res.status(422).send({ message: 'No token specified.' })
+      }
+
       let decoded
       try {
         decoded = jwt.verify(token, process.env.JWT_SECRET)
       } catch (e) {
         return res.status(403).send({ message: 'Token incorrect.' })
       }
+
       if (!decoded.hasOwnProperty('email') || !decoded.hasOwnProperty('expiration')) {
         return res.status(403).send({ message: 'Token incorrect.' })
       }
 
       const { email, expiration } = decoded
 
-      if (expiration < new Date()) {
+      if (new Date(expiration) < new Date()) {
         return res.status(403).send({ message: 'Token expired.' })
       }
 
-      models.User.findOne({
+      const user = await models.User.findOne({
         where: { email }
-      }).then((user) => {
-        if (!user) {
-          return res.status(403).send({ message: 'User does not exists' })
-        } else {
-          req.session.role = user.get('role')
-          req.session.userID = user.get('id')
-          console.log(req.session.role, user.get('role'), user.get('id'), req.session.id)
-          req.session.authenticated = true
-          return res.status(200).send({ message: 'Successfully signed in.' })
-        }
       })
+
+      if (!user) {
+        return res.status(403).send({ message: 'User does not exists' })
+      }
+
+      req.session.role = user.get('role')
+      req.session.userID = user.get('id')
+      console.log(req.session.role, user.get('role'), user.get('id'), req.session.id)
+      req.session.authenticated = true
+      return res.status(200).send({ message: 'Successfully signed in.' })
+    } catch (error) {
+      return res.status(500).send('')
     }
   })
 }
@@ -143,7 +152,7 @@ if (process.env.NODE_ENV === 'production') {
   hosts = ['http://localhost:3000']
 }
 
-// TODO not secure!!!
+// TODO maybe not secure!!!
 function getHost (req) {
   const host = req.headers.origin
   console.log(host)

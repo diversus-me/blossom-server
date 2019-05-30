@@ -4,6 +4,86 @@ import moment from 'moment'
 import momentDurationFormat from 'moment-duration-format' // eslint-disable-line no-unused-vars
 const getVideoId = require('get-video-id')
 
+export function getFlowers (app, models) {
+  app.get('/api/allFlowers', async (req, res) => {
+    try {
+      const flowers = await models.Flower.findAll({
+        attributes: [ 'title', 'description', 'created' ],
+        include: [{
+          model: models.User,
+          attributes: ['id', 'name']
+        },
+        {
+          model: models.Node,
+          attributes: ['id'],
+          include: [{
+            model: models.Video,
+            attributes: ['url', 'type', 'uploaded', 'duration']
+          }]
+        }
+        ]
+      })
+      return res.status(200).send({ data: flowers })
+    } catch (error) {
+      return res.status(500).send('')
+    }
+  })
+}
+
+export function getNode (app, models) {
+  app.get('/api/node/:uid', async (req, res) => {
+    try {
+      const node = await models.Node.findOne({
+        where: {
+          id: req.params.uid
+        },
+        attributes: [
+          'id', 'title', 'created'
+        ],
+        include: [{
+          model: models.User,
+          attributes: ['id', 'name']
+        },
+        {
+          model: models.Video,
+          attributes: ['url', 'type', 'uploaded', 'duration']
+        }]
+      })
+
+      if (!node) {
+        return res.status(404).send('Node not found.')
+      }
+
+      const connections = await node.getConnections({
+        attributes: [
+          'created', 'flavor', 'id', 'sourceIn', 'sourceOut'
+        ],
+        include: [{
+          model: models.Node,
+          as: 'targetNode',
+          attributes: ['id', 'created', 'title'],
+          include: [{
+            model: models.Video,
+            attributes: ['url', 'type', 'uploaded', 'duration']
+          }]
+        },
+        {
+          model: models.User,
+          attributes: ['id', 'name']
+        }]
+      })
+
+      if (!connections) {
+        return res.status(405).send('Connections not found.')
+      }
+
+      return res.status(200).send({ data: node, connections })
+    } catch (error) {
+      return res.status(500).send('')
+    }
+  })
+}
+
 export function createFlower (app, models) {
   app.post('/api/flower', checkSchema({
     title: {
@@ -49,64 +129,65 @@ export function createFlower (app, models) {
         errorMessage: 'Malformed link.'
       }
     }
-  }), (req, res) => {
-    const errors = validationResult(req)
+  }), async (req, res) => {
+    try {
+      const errors = validationResult(req)
 
-    if (!errors.isEmpty()) {
-      console.log(errors.array())
-      return res.status(422).jsonp(errors.array())
-    }
-    const { title, description, type, link } = req.body
-    models.User.findOne({
-      where: {
-        id: req.session.userID
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array())
       }
-    }).then(user => {
+
+      const { title, description, type, link } = req.body
+      const user = await models.User.findOne({
+        where: {
+          id: req.session.userID
+        }
+      })
       if (!user) {
         return res.status(404).send('User not found.')
-      } else {
-        const vidId = getVideoId(link).id
-        fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-          .then(checkStatus)
-          .then(body => {
-            console.log(body.items[0].contentDetails.duration)
-            if (!body.items[0]) {
-              throw Error('Video not found')
-            } else {
-              const duration = body.items[0].contentDetails.duration
-              const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
-              models.Video.create({
-                type,
-                userId: user.get('id'),
-                url: vidId,
-                duration: parsedDuration
-              }).then((video) => {
-                models.Node.create({
-                  title,
-                  videoId: video.get('id'),
-                  userId: user.get('id'),
-                  created: new Date()
-                })
-                  .then((node) => {
-                    models.Flower.create({
-                      title,
-                      description,
-                      userId: user.get('id'),
-                      nodeId: node.get('id'),
-                      created: new Date()
-                    }).then((flower) => {
-                      return res.status(200).send({ message: 'Flower was created' })
-                    })
-                  })
-              })
-            }
-          })
-          .catch((error) => {
-            console.log(error)
-            return res.status(424).send('Video not found')
-          })
       }
-    })
+
+      const vidId = getVideoId(link).id
+      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
+      const body = await checkStatus(response)
+
+      if (!body.items[0]) {
+        return res.status(422).send('Video not found')
+      }
+
+      const duration = body.items[0].contentDetails.duration
+      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      const video = await models.Video.create({
+        type,
+        userId: user.get('id'),
+        url: vidId,
+        duration: parsedDuration
+      })
+
+      const node = await models.Node.create({
+        title,
+        videoId: video.get('id'),
+        userId: user.get('id'),
+        created: new Date()
+      })
+
+      const flower = await models.Flower.create({
+        title,
+        description,
+        userId: user.get('id'),
+        nodeId: node.get('id'),
+        created: new Date()
+      })
+
+      if (!flower) {
+        return res.status(405).send('Flower was not created.')
+      }
+
+      return res.status(200).send({ message: 'Flower was created' })
+    } catch (error) {
+      console.log(error)
+      return res.status(500).send('')
+    }
   })
 }
 
@@ -204,65 +285,69 @@ export function addNode (app, models) {
         errorMessage: 'TargetOut is empty'
       }
     }
-  }), (req, res) => {
-    const errors = validationResult(req)
+  }), async (req, res) => {
+    try {
+      const errors = validationResult(req)
 
-    if (!errors.isEmpty()) {
-      return res.status(422).jsonp(errors.array())
-    } else {
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array())
+      }
+
       const { id, title, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
-      models.User.findOne({
+
+      const user = await models.User.findOne({
         where: {
           id: req.session.userID
         }
-      }).then(user => {
-        if (!user) {
-          return res.status(404).send('User not found.')
-        } else {
-          const vidId = getVideoId(link).id
-          fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-            .then(checkStatus)
-            .then(body => {
-              if (!body.items[0]) {
-                throw Error('Video not found')
-              } else {
-                const duration = body.items[0].contentDetails.duration
-                const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
-                models.Video.create({
-                  type,
-                  userId: user.get('id'),
-                  url: vidId,
-                  duration: parsedDuration
-                }).then((video) => {
-                  models.Node.create({
-                    title,
-                    videoId: video.get('id'),
-                    userId: user.get('id'),
-                    created: new Date()
-                  })
-                    .then((node) => {
-                      models.Connection.create({
-                        sourceIn,
-                        sourceOut,
-                        targetIn,
-                        targetOut,
-                        flavor,
-                        userId: user.get('id'),
-                        targetNodeId: node.get('id'),
-                        nodeId: id,
-                        created: new Date()
-                      }).then((connection) => {
-                        return res.status(200).send({ message: 'Node was created' })
-                      })
-                    })
-                })
-              }
-            }).catch((error) => {
-              console.log(error)
-              return res.status(424).send('Video not found')
-            })
-        }
       })
+
+      if (!user) {
+        return res.status(404).send('User not found.')
+      }
+
+      const vidId = getVideoId(link).id
+      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
+      const body = await checkStatus(response)
+
+      if (!body.items[0]) {
+        return res.status(422).send('Video not found')
+      }
+
+      const duration = body.items[0].contentDetails.duration
+      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      const video = await models.Video.create({
+        type,
+        userId: user.get('id'),
+        url: vidId,
+        duration: parsedDuration
+      })
+
+      const node = await models.Node.create({
+        title,
+        videoId: video.get('id'),
+        userId: user.get('id'),
+        created: new Date()
+      })
+
+      const connection = await models.Connection.create({
+        sourceIn,
+        sourceOut,
+        targetIn,
+        targetOut,
+        flavor,
+        userId: user.get('id'),
+        targetNodeId: node.get('id'),
+        nodeId: id,
+        created: new Date()
+      })
+
+      if (!connection) {
+        return res.status(500).send('Connection could not be created')
+      }
+
+      return res.status(200).send({ message: 'Node was created' })
+    } catch (errors) {
+      return res.status(500).send('')
     }
   })
 }
