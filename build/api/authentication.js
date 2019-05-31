@@ -18,6 +18,10 @@ var _htmlTemplate = _interopRequireDefault(require("./htmlTemplate"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 function generateTransporter() {
   var transporter = _nodemailer["default"].createTransport({
     auth: {
@@ -45,108 +49,204 @@ function loginLink(app, models, transporter) {
       isEmail: true,
       errorMessage: 'Invalid email'
     }
-  }), function (req, res) {
-    var email = req.body.email;
-    var errors = (0, _check.validationResult)(req);
-    var host = getHost(req);
+  }),
+  /*#__PURE__*/
+  function () {
+    var _ref = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee(req, res) {
+      var email, errors, host, user, token, mailOptions;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              email = req.body.email;
+              errors = (0, _check.validationResult)(req);
+              host = getHost(req);
 
-    if (!host) {
-      return res.status(403).jsonp(errors.array());
-    }
+              if (host) {
+                _context.next = 6;
+                break;
+              }
 
-    if (!errors.isEmpty()) {
-      return res.status(422).jsonp(errors.array());
-    } else {
-      models.User.findOne({
-        where: {
-          email: email
-        }
-      }).then(function (user) {
-        if (user) {
-          var token = generateToken(email);
-          var mailOptions = {
-            from: 'login@diversus.me',
-            html: (0, _htmlTemplate["default"])("".concat(host, "/?token=").concat(token)),
-            subject: 'Login',
-            to: email
-          };
-          transporter.sendMail(mailOptions, function (error) {
-            if (error) {
-              return res.status(500).send({
-                error: error
+              return _context.abrupt("return", res.status(403).jsonp(errors.array()));
+
+            case 6:
+              if (errors.isEmpty()) {
+                _context.next = 8;
+                break;
+              }
+
+              return _context.abrupt("return", res.status(422).jsonp(errors.array()));
+
+            case 8:
+              _context.next = 10;
+              return models.User.findOne({
+                where: {
+                  email: email
+                }
               });
-            }
 
-            return res.status(200).send({
-              message: "Mail has been sent to ".concat(email)
-            });
-          });
-        } else {
-          return res.status(404).send({
-            message: 'User does not exists}'
-          });
+            case 10:
+              user = _context.sent;
+
+              if (user) {
+                _context.next = 13;
+                break;
+              }
+
+              return _context.abrupt("return", res.status(404).send({
+                message: 'User does not exists'
+              }));
+
+            case 13:
+              token = generateToken(email);
+              mailOptions = {
+                from: 'login@diversus.me',
+                html: (0, _htmlTemplate["default"])("".concat(host, "/?token=").concat(token)),
+                subject: 'Login',
+                to: email
+              };
+              transporter.sendMail(mailOptions, function (error) {
+                if (error) {
+                  return res.status(500).send({
+                    error: error
+                  });
+                }
+
+                return res.status(200).send({
+                  message: "Mail has been sent to ".concat(email)
+                });
+              });
+              _context.next = 21;
+              break;
+
+            case 18:
+              _context.prev = 18;
+              _context.t0 = _context["catch"](0);
+              return _context.abrupt("return", res.status(500).send(''));
+
+            case 21:
+            case "end":
+              return _context.stop();
+          }
         }
-      });
-    }
-  });
+      }, _callee, null, [[0, 18]]);
+    }));
+
+    return function (_x, _x2) {
+      return _ref.apply(this, arguments);
+    };
+  }());
 }
 
 function login(app, models) {
-  app.get('/api/login', function (req, res) {
-    var token = req.query.token;
+  app.get('/api/login',
+  /*#__PURE__*/
+  function () {
+    var _ref2 = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee2(req, res) {
+      var token, decoded, _decoded, email, expiration, user;
 
-    if (!token) {
-      return res.status(422).send({
-        message: 'No token specified.'
-      });
-    } else {
-      var decoded;
+      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.prev = 0;
+              token = req.query.token;
 
-      try {
-        decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET);
-      } catch (e) {
-        return res.status(403).send({
-          message: 'Token incorrect.'
-        });
-      }
+              if (token) {
+                _context2.next = 4;
+                break;
+              }
 
-      if (!decoded.hasOwnProperty('email') || !decoded.hasOwnProperty('expiration')) {
-        return res.status(403).send({
-          message: 'Token incorrect.'
-        });
-      }
+              return _context2.abrupt("return", res.status(422).send({
+                message: 'No token specified.'
+              }));
 
-      var _decoded = decoded,
-          email = _decoded.email,
-          expiration = _decoded.expiration;
+            case 4:
+              _context2.prev = 4;
+              decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET);
+              _context2.next = 11;
+              break;
 
-      if (expiration < new Date()) {
-        return res.status(403).send({
-          message: 'Token expired.'
-        });
-      }
+            case 8:
+              _context2.prev = 8;
+              _context2.t0 = _context2["catch"](4);
+              return _context2.abrupt("return", res.status(403).send({
+                message: 'Token incorrect.'
+              }));
 
-      models.User.findOne({
-        where: {
-          email: email
+            case 11:
+              if (!(!decoded.hasOwnProperty('email') || !decoded.hasOwnProperty('expiration'))) {
+                _context2.next = 13;
+                break;
+              }
+
+              return _context2.abrupt("return", res.status(403).send({
+                message: 'Token incorrect.'
+              }));
+
+            case 13:
+              _decoded = decoded, email = _decoded.email, expiration = _decoded.expiration;
+
+              if (!(new Date(expiration) < new Date())) {
+                _context2.next = 16;
+                break;
+              }
+
+              return _context2.abrupt("return", res.status(403).send({
+                message: 'Token expired.'
+              }));
+
+            case 16:
+              _context2.next = 18;
+              return models.User.findOne({
+                where: {
+                  email: email
+                }
+              });
+
+            case 18:
+              user = _context2.sent;
+
+              if (user) {
+                _context2.next = 21;
+                break;
+              }
+
+              return _context2.abrupt("return", res.status(403).send({
+                message: 'User does not exists'
+              }));
+
+            case 21:
+              req.session.role = user.get('role');
+              req.session.userID = user.get('id');
+              console.log(req.session.role, user.get('role'), user.get('id'), req.session.id);
+              req.session.authenticated = true;
+              return _context2.abrupt("return", res.status(200).send({
+                message: 'Successfully signed in.'
+              }));
+
+            case 28:
+              _context2.prev = 28;
+              _context2.t1 = _context2["catch"](0);
+              return _context2.abrupt("return", res.status(500).send(''));
+
+            case 31:
+            case "end":
+              return _context2.stop();
+          }
         }
-      }).then(function (user) {
-        if (!user) {
-          return res.status(403).send({
-            message: 'User does not exists'
-          });
-        } else {
-          req.session.role = user.get('role');
-          req.session.userID = user.get('id');
-          console.log(req.session.role, user.get('role'), user.get('id'), req.session.id);
-          req.session.authenticated = true;
-          return res.status(200).send({
-            message: 'Successfully signed in.'
-          });
-        }
-      });
-    }
-  });
+      }, _callee2, null, [[0, 28], [4, 8]]);
+    }));
+
+    return function (_x3, _x4) {
+      return _ref2.apply(this, arguments);
+    };
+  }());
 }
 
 function checkLogin(app, models) {
@@ -178,10 +278,10 @@ function generateToken(email) {
 var hosts = [];
 
 if (process.env.NODE_ENV === 'production') {
-  hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
+  hosts = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com', 'https://nettz.diversus.me'];
 } else {
   hosts = ['http://localhost:3000'];
-} // TODO not secure!!!
+} // TODO maybe not secure!!!
 
 
 function getHost(req) {

@@ -41,7 +41,6 @@ function checkAdmin(req, res, next) {
 
 function checkStatus(res) {
   if (res.ok) {
-    // res.status >= 200 && res.status < 300
     return res.json();
   } else {
     throw Error('Connection Fail');
@@ -49,26 +48,7 @@ function checkStatus(res) {
 }
 
 function defineAPI(app, models) {
-  app.get('/api/allFlowers', function (req, res) {
-    models.Flower.findAll({
-      attributes: ['title', 'description', 'created'],
-      include: [{
-        model: models.User,
-        attributes: ['id', 'name']
-      }, {
-        model: models.Node,
-        attributes: ['id'],
-        include: [{
-          model: models.Video,
-          attributes: ['url', 'type', 'uploaded', 'duration']
-        }]
-      }]
-    }).then(function (flowers) {
-      return res.status(200).send({
-        data: flowers
-      });
-    });
-  });
+  (0, _flower.getFlowers)(app, models);
   app.get('/api/videoLength', function (req, res) {
     var vidId = getVideoId(req.query.videolink).id;
 
@@ -95,28 +75,7 @@ function defineAPI(app, models) {
       console.log(error);
       return res.status(424).send('Video not found');
     });
-  }); // app.get('/api/allFlowers', (req, res) => {
-  //   models.User.findOne({
-  //     where : {
-  //       id: req.session.userID
-  //     },
-  //     // include: [{
-  //     //   model: models.User,
-  //     //   attributes: ['id', 'name']
-  //     // }]
-  //   })
-  //   .then((user) => {
-  //     user.getFlowers({
-  //       attributes: [
-  //         'id', 'title', 'description', 'created'
-  //       ],
-  //     }).then((flowers) => {
-  //       console.log(flowers)
-  //       return res.status(200).send({data:flowers})
-  //     })
-  //   })
-  // })
-
+  });
   var tranporter = (0, _authentication.generateTransporter)();
   (0, _authentication.checkLogin)(app, models);
   (0, _authentication.loginLink)(app, models, tranporter);
@@ -125,48 +84,5 @@ function defineAPI(app, models) {
   (0, _user.deleteUser)(app, models, checkAuth, checkAdmin);
   (0, _flower.createFlower)(app, models);
   (0, _flower.addNode)(app, models);
-  app.get('/api/node/:uid', function (req, res) {
-    models.Node.findOne({
-      where: {
-        id: req.params.uid
-      },
-      attributes: ['id', 'title', 'created'],
-      include: [{
-        model: models.User,
-        attributes: ['id', 'name']
-      }, {
-        model: models.Video,
-        attributes: ['url', 'type', 'uploaded', 'duration']
-      }]
-    }).then(function (node) {
-      if (!node) {
-        return res.status(404).send('Node not found.');
-      }
-
-      node.getConnections({
-        attributes: ['created', 'flavor', 'id', 'sourceIn', 'sourceOut'],
-        include: [{
-          model: models.Node,
-          as: 'targetNode',
-          attributes: ['id', 'created', 'title'],
-          include: [{
-            model: models.Video,
-            attributes: ['url', 'type', 'uploaded', 'duration']
-          }]
-        }, {
-          model: models.User,
-          attributes: ['id', 'name']
-        }]
-      }).then(function (connections) {
-        if (!connections) {
-          return res.status(405).send('Connections not found.');
-        }
-
-        return res.status(200).send({
-          data: node,
-          connections: connections
-        });
-      });
-    });
-  });
+  (0, _flower.getNode)(app, models);
 }

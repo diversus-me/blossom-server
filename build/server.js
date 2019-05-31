@@ -31,7 +31,7 @@ postgres.authenticate().then(function () {
 /* Sync with Database */
 
 var models = (0, _initPostgres["default"])(postgres);
-var whitelist = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com'];
+var whitelist = ["".concat(process.env.HOST), 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com', 'https://nettz.diversus.me'];
 app.use((0, _cors["default"])({
   credentials: true,
   origin: function origin(_origin, callback) {
