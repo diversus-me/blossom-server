@@ -146,7 +146,8 @@ if (process.env.NODE_ENV === 'production') {
     `${process.env.HOST}`,
     'https://flower.dev.diversus.me',
     'https://flower.diversus.me',
-    'https://flowerblossom-dev.netlify.com'
+    'https://flowerblossom-dev.netlify.com',
+    'https://nettz.diversus.me'
   ]
 } else {
   hosts = ['http://localhost:3000']

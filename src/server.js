@@ -32,7 +32,8 @@ const whitelist = [
   `${process.env.HOST}`,
   'https://flower.dev.diversus.me',
   'https://flower.diversus.me',
-  'https://flowerblossom-dev.netlify.com'
+  'https://flowerblossom-dev.netlify.com',
+  'https://nettz.diversus.me'
 ]
 
 app.use(cors({
