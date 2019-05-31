@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.4.4",
     "babel-loader": "^8.0.6",
     "connect-dynamodb": "^2.0.3",
     "connect-pg-simple": "^5.0.0",

@@ -3,20 +3,20 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = initDatabase;
+exports.default = initDatabase;
 
 var _sequelize = _interopRequireDefault(require("sequelize"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function initDatabase(database) {
-  var User = database.define('user', {
+  const User = database.define('user', {
     name: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     },
     email: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false,
       unique: true,
       validate: {
@@ -24,80 +24,80 @@ function initDatabase(database) {
       }
     },
     joined: {
-      type: _sequelize["default"].DATE,
-      defaultValue: _sequelize["default"].NOW
+      type: _sequelize.default.DATE,
+      defaultValue: _sequelize.default.NOW
     },
     role: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       defaultValue: 'user',
       allowNull: false
     }
   });
-  var Flower = database.define('flower', {
+  const Flower = database.define('flower', {
     title: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     },
     description: {
-      type: _sequelize["default"].TEXT,
+      type: _sequelize.default.TEXT,
       allowNull: true
     },
     created: {
-      type: _sequelize["default"].DATE,
-      defaultValue: _sequelize["default"].NOW
+      type: _sequelize.default.DATE,
+      defaultValue: _sequelize.default.NOW
     }
   });
-  var Node = database.define('node', {
+  const Node = database.define('node', {
     title: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     },
     created: {
-      type: _sequelize["default"].DATE,
-      defaultValue: _sequelize["default"].NOW
+      type: _sequelize.default.DATE,
+      defaultValue: _sequelize.default.NOW
     }
   });
-  var Video = database.define('video', {
+  const Video = database.define('video', {
     url: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     },
     uploaded: {
-      type: _sequelize["default"].DATE,
-      defaultValue: _sequelize["default"].NOW
+      type: _sequelize.default.DATE,
+      defaultValue: _sequelize.default.NOW
     },
     type: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     },
     duration: {
-      type: _sequelize["default"].INTEGER,
+      type: _sequelize.default.INTEGER,
       allowNull: false
     }
   });
-  var Connection = database.define('connection', {
+  const Connection = database.define('connection', {
     sourceIn: {
-      type: _sequelize["default"].INTEGER,
+      type: _sequelize.default.INTEGER,
       allowNull: false
     },
     sourceOut: {
-      type: _sequelize["default"].INTEGER,
+      type: _sequelize.default.INTEGER,
       allowNull: false
     },
     targetIn: {
-      type: _sequelize["default"].INTEGER,
+      type: _sequelize.default.INTEGER,
       allowNull: false
     },
     targetOut: {
-      type: _sequelize["default"].INTEGER,
+      type: _sequelize.default.INTEGER,
       allowNull: false
     },
     created: {
-      type: _sequelize["default"].DATE,
-      defaultValue: _sequelize["default"].NOW
+      type: _sequelize.default.DATE,
+      defaultValue: _sequelize.default.NOW
     },
     flavor: {
-      type: _sequelize["default"].STRING,
+      type: _sequelize.default.STRING,
       allowNull: false
     }
   }); // database.sync({ force: true })
@@ -130,10 +130,10 @@ function initDatabase(database) {
   });
   database.sync();
   return {
-    Flower: Flower,
-    Node: Node,
-    Connection: Connection,
-    User: User,
-    Video: Video
+    Flower,
+    Node,
+    Connection,
+    User,
+    Video
   };
 }

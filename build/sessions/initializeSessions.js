@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = initializeSessions;
+exports.default = initializeSessions;
 
 var _expressSession = _interopRequireDefault(require("express-session"));
 
@@ -13,15 +13,15 @@ var _connectPgSimple = _interopRequireDefault(require("connect-pg-simple"));
 
 var _pg = _interopRequireDefault(require("pg"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var maxAge = 86400000;
+const maxAge = 86400000;
 
 function initializeSessions(app) {
-  var store = {};
+  let store = {};
 
   if (process.env.NODE_ENV === 'production') {
-    var dynamoOptions = {
+    const dynamoOptions = {
       table: 'blossom-sessions',
       hashKey: 'sessionID',
       AWSConfigJSON: {
@@ -32,12 +32,12 @@ function initializeSessions(app) {
       readCapacityUnits: 5,
       writeCapacityUnits: 5
     };
-    var DynamoDBStore = (0, _connectDynamodb["default"])(_expressSession["default"]);
+    const DynamoDBStore = (0, _connectDynamodb.default)(_expressSession.default);
     store = new DynamoDBStore(dynamoOptions);
   } else {
     // TODO: Postgres as local session store not working
-    var postgresOptions = {
-      pool: _pg["default"].Pool({
+    const postgresOptions = {
+      pool: _pg.default.Pool({
         user: process.env.RDS_USERNAME,
         host: process.env.RDS_HOSTNAME,
         database: process.env.RDS_DB_NAME,
@@ -45,19 +45,19 @@ function initializeSessions(app) {
         port: process.env.RDS_PORT
       })
     };
-    var PostgresStore = (0, _connectPgSimple["default"])(_expressSession["default"]); // store = new PostgresStore(postgresOptions)
+    const PostgresStore = (0, _connectPgSimple.default)(_expressSession.default); // store = new PostgresStore(postgresOptions)
 
     store = null;
   }
 
-  app.use((0, _expressSession["default"])({
-    store: store,
+  app.use((0, _expressSession.default)({
+    store,
     secret: process.env.COOKIE_SECRET,
     key: 'user_sid',
     resave: false,
     saveUninitialized: true,
     cookie: {
-      maxAge: maxAge
+      maxAge
     }
   }));
 }

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = defineAPI;
+exports.default = defineAPI;
 
 var _user = require("./api/user");
 
@@ -17,10 +17,10 @@ var _moment = _interopRequireDefault(require("moment"));
 
 var _momentDurationFormat = _interopRequireDefault(require("moment-duration-format"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-line no-unused-vars
-var getVideoId = require('get-video-id');
+const getVideoId = require('get-video-id');
 
 function checkAuth(req, res, next) {
   if (req.session.authenticated) {
@@ -49,20 +49,20 @@ function checkStatus(res) {
 
 function defineAPI(app, models) {
   (0, _flower.getFlowers)(app, models);
-  app.get('/api/videoLength', function (req, res) {
-    var vidId = getVideoId(req.query.videolink).id;
+  app.get('/api/videoLength', (req, res) => {
+    const vidId = getVideoId(req.query.videolink).id;
 
     if (!vidId) {
       return res.status(424).send('Video not found');
     }
 
-    (0, _nodeFetch["default"])("https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=".concat(vidId, "&key=").concat(process.env.YOUTUBE_API_KEY)).then(checkStatus).then(function (body) {
+    (0, _nodeFetch.default)(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`).then(checkStatus).then(body => {
       if (!body.items[0]) {
         throw Error('Video not found');
       } else {
-        var duration = body.items[0].contentDetails.duration;
+        const duration = body.items[0].contentDetails.duration;
 
-        var parsedDuration = _moment["default"].duration(duration).format('s', {
+        const parsedDuration = _moment.default.duration(duration).format('s', {
           trim: false,
           useGrouping: false
         });
@@ -71,12 +71,12 @@ function defineAPI(app, models) {
           duration: parsedDuration
         });
       }
-    })["catch"](function (error) {
+    }).catch(error => {
       console.log(error);
       return res.status(424).send('Video not found');
     });
   });
-  var tranporter = (0, _authentication.generateTransporter)();
+  const tranporter = (0, _authentication.generateTransporter)();
   (0, _authentication.checkLogin)(app, models);
   (0, _authentication.loginLink)(app, models, tranporter);
   (0, _authentication.login)(app, models);
