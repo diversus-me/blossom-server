@@ -4,6 +4,7 @@ require('dotenv').config()
 import express from 'express'
 import cors from 'cors'
 
+import { hosts } from './hosts'
 import connectPostgres from './postgres/connectPostgres'
 import initPostgres from './postgres/initPostgres'
 import initializeSessions from './sessions/initializeSessions'
@@ -28,18 +29,10 @@ initializeSessions(app)
 /* Sync with Database */
 const models = initPostgres(postgres)
 
-const whitelist = [
-  `${process.env.HOST}`,
-  'https://flower.dev.diversus.me',
-  'https://flower.diversus.me',
-  'https://flowerblossom-dev.netlify.com',
-  'https://nettz.diversus.me'
-]
-
 app.use(cors({
   credentials: true,
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (hosts.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))

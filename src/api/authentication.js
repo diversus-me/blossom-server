@@ -4,6 +4,7 @@ import nodemailer from 'nodemailer'
 import { checkSchema, validationResult } from 'express-validator/check'
 
 import htmlTemplate from './htmlTemplate'
+import { hosts } from '../hosts'
 
 export function generateTransporter () {
   const transporter = nodemailer.createTransport({
@@ -138,25 +139,12 @@ function generateToken (email) {
   return jwt.sign({ email, expiration: date }, process.env.JWT_SECRET)
 }
 
-// TODO correctly handle possible hosts for development and production
-let hosts = []
-
-if (process.env.NODE_ENV === 'production') {
-  hosts = [
-    `${process.env.HOST}`,
-    'https://flower.dev.diversus.me',
-    'https://flower.diversus.me',
-    'https://flowerblossom-dev.netlify.com',
-    'https://nettz.diversus.me'
-  ]
-} else {
-  hosts = ['http://localhost:3000']
-}
-
-// TODO maybe not secure!!!
 function getHost (req) {
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000'
+  }
+
   const host = req.headers.origin
-  console.log(host)
   if (hosts.indexOf(host) > -1) {
     return host
   } else {

@@ -98,8 +98,8 @@ function getNode(app, models) {
   });
 }
 
-function createFlower(app, models) {
-  app.post('/api/flower', (0, _check.checkSchema)({
+function createFlower(app, models, checkAuth) {
+  app.post('/api/flower', checkAuth, (0, _check.checkSchema)({
     title: {
       isString: {
         errorMessage: 'Title is not a string'
@@ -218,8 +218,8 @@ function createFlower(app, models) {
   });
 }
 
-function addNode(app, models) {
-  app.post('/api/node', (0, _check.checkSchema)({
+function addNode(app, models, checkAuth) {
+  app.post('/api/node', checkAuth, (0, _check.checkSchema)({
     id: {
       isInt: {
         errorMessage: 'ID is not an integer.'

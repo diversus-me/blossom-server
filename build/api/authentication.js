@@ -16,6 +16,8 @@ var _check = require("express-validator/check");
 
 var _htmlTemplate = _interopRequireDefault(require("./htmlTemplate"));
 
+var _hosts = require("../hosts");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function generateTransporter() {
@@ -185,23 +187,16 @@ function generateToken(email) {
     email,
     expiration: date
   }, process.env.JWT_SECRET);
-} // TODO correctly handle possible hosts for development and production
-
-
-let hosts = [];
-
-if (process.env.NODE_ENV === 'production') {
-  hosts = [`${process.env.HOST}`, 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com', 'https://nettz.diversus.me'];
-} else {
-  hosts = ['http://localhost:3000'];
-} // TODO maybe not secure!!!
-
+}
 
 function getHost(req) {
-  const host = req.headers.origin;
-  console.log(host);
+  if (process.env.NODE_ENV === 'development') {
+    return 'http://localhost:3000';
+  }
 
-  if (hosts.indexOf(host) > -1) {
+  const host = req.headers.origin;
+
+  if (_hosts.hosts.indexOf(host) > -1) {
     return host;
   } else {
     return false;

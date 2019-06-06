@@ -84,8 +84,8 @@ export function getNode (app, models) {
   })
 }
 
-export function createFlower (app, models) {
-  app.post('/api/flower', checkSchema({
+export function createFlower (app, models, checkAuth) {
+  app.post('/api/flower', checkAuth, checkSchema({
     title: {
       isString: {
         errorMessage: 'Title is not a string'
@@ -191,8 +191,8 @@ export function createFlower (app, models) {
   })
 }
 
-export function addNode (app, models) {
-  app.post('/api/node', checkSchema({
+export function addNode (app, models, checkAuth) {
+  app.post('/api/node', checkAuth, checkSchema({
     id: {
       isInt: {
         errorMessage: 'ID is not an integer.'

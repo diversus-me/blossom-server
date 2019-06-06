@@ -4,6 +4,8 @@ var _express = _interopRequireDefault(require("express"));
 
 var _cors = _interopRequireDefault(require("cors"));
 
+var _hosts = require("./hosts");
+
 var _connectPostgres = _interopRequireDefault(require("./postgres/connectPostgres"));
 
 var _initPostgres = _interopRequireDefault(require("./postgres/initPostgres"));
@@ -31,11 +33,10 @@ postgres.authenticate().then(() => {
 /* Sync with Database */
 
 const models = (0, _initPostgres.default)(postgres);
-const whitelist = [`${process.env.HOST}`, 'https://flower.dev.diversus.me', 'https://flower.diversus.me', 'https://flowerblossom-dev.netlify.com', 'https://nettz.diversus.me'];
 app.use((0, _cors.default)({
   credentials: true,
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (_hosts.hosts.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
