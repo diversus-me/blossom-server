@@ -36,9 +36,15 @@ function defineAPI(app, models) {
   (0, _authentication.checkLogin)(app, models);
   (0, _authentication.loginLink)(app, models, tranporter);
   (0, _authentication.login)(app, models);
+  (0, _authentication.logout)(app, models);
+  (0, _user.getUsers)(app, models, checkAuth, checkAdmin);
   (0, _user.createUser)(app, models, checkAuth, checkAdmin);
   (0, _user.deleteUser)(app, models, checkAuth, checkAdmin);
   (0, _flower.createFlower)(app, models, checkAuth);
+  (0, _flower.deleteFlower)(app, models, checkAuth);
+  (0, _flower.editFlower)(app, models, checkAuth);
   (0, _flower.addNode)(app, models, checkAuth);
   (0, _flower.getNode)(app, models);
+  (0, _flower.editNode)(app, models, checkAuth);
+  (0, _flower.deleteNode)(app, models, checkAuth);
 }

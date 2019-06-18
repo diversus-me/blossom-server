@@ -5,8 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.getFlowers = getFlowers;
 exports.getNode = getNode;
+exports.deleteFlower = deleteFlower;
+exports.editFlower = editFlower;
 exports.createFlower = createFlower;
 exports.addNode = addNode;
+exports.editNode = editNode;
+exports.deleteNode = deleteNode;
 
 var _check = require("express-validator/check");
 
@@ -25,7 +29,7 @@ function getFlowers(app, models) {
   app.get('/api/allFlowers', async (req, res) => {
     try {
       const flowers = await models.Flower.findAll({
-        attributes: ['title', 'description', 'created'],
+        attributes: ['title', 'description', 'created', 'id'],
         include: [{
           model: models.User,
           attributes: ['id', 'name']
@@ -69,7 +73,7 @@ function getNode(app, models) {
       }
 
       const connections = await node.getConnections({
-        attributes: ['created', 'flavor', 'id', 'sourceIn', 'sourceOut'],
+        attributes: ['created', 'flavor', 'id', 'sourceIn', 'sourceOut', 'targetIn', 'targetOut'],
         include: [{
           model: models.Node,
           as: 'targetNode',
@@ -93,6 +97,133 @@ function getNode(app, models) {
         connections
       });
     } catch (error) {
+      return res.status(500).send('');
+    }
+  });
+}
+
+function deleteFlower(app, models, checkAuth) {
+  app.delete('/api/flower', checkAuth, (0, _check.checkSchema)({
+    id: {
+      isNumber: {
+        errorMessage: 'id is not a string'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'id is empty'
+      }
+    }
+  }), async (req, res) => {
+    try {
+      const errors = (0, _check.validationResult)(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array());
+      }
+
+      const {
+        id
+      } = req.body;
+      const flower = await models.Flower.findOne({
+        where: {
+          id
+        }
+      });
+
+      if (!flower) {
+        return res.status(404).send('Flower does not exist');
+      }
+
+      if (req.session.userID !== flower.get('userId') && req.session.role !== 'admin') {
+        return res.status(403).send('Not allowed.');
+      }
+
+      const rowDeleted = await models.Flower.destroy({
+        where: {
+          id
+        }
+      });
+
+      if (rowDeleted <= 0) {
+        return res.status(409).send('Flower could not be deleted');
+      }
+
+      return res.status(200).send({
+        message: 'Flower was deleted'
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send('');
+    }
+  });
+}
+
+function editFlower(app, models, checkAuth) {
+  app.patch('/api/flower', checkAuth, (0, _check.checkSchema)({
+    id: {
+      isNumber: {
+        errorMessage: 'id is not a string'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'id is empty'
+      }
+    },
+    title: {
+      isString: {
+        errorMessage: 'Title is not a string'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'Title is empty'
+      }
+    },
+    description: {
+      isString: {
+        errorMessage: 'Description is not a string'
+      }
+    }
+  }), async (req, res) => {
+    try {
+      const errors = (0, _check.validationResult)(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array());
+      }
+
+      const {
+        id,
+        title,
+        description
+      } = req.body;
+      const flower = await models.Flower.findOne({
+        where: {
+          id
+        }
+      });
+
+      if (!flower) {
+        return res.status(404).send('Flower does not exist');
+      }
+
+      if (req.session.userID !== flower.get('userId') && req.session.role !== 'admin') {
+        return res.status(403).send('Not allowed.');
+      }
+
+      const updated = await flower.update({
+        title,
+        description
+      });
+
+      if (!updated) {
+        return res.status(409).send('Flower could not be updated');
+      }
+
+      return res.status(200).send({
+        message: 'Flower was updated'
+      });
+    } catch (error) {
+      console.log(error);
       return res.status(500).send('');
     }
   });
@@ -388,6 +519,210 @@ function addNode(app, models, checkAuth) {
 
       return res.status(200).send({
         message: 'Node was created'
+      });
+    } catch (errors) {
+      return res.status(500).send('');
+    }
+  });
+}
+
+function editNode(app, models, checkAuth) {
+  app.patch('/api/node', checkAuth, (0, _check.checkSchema)({
+    id: {
+      isInt: {
+        errorMessage: 'ID is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'ID not specified.'
+      }
+    },
+    title: {
+      isString: {
+        errorMessage: 'Title is not a string.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'Title not specified.'
+      }
+    },
+    sourceIn: {
+      isInt: {
+        errorMessage: 'SourceIn is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'SourceIn is empty'
+      }
+    },
+    sourceOut: {
+      isInt: {
+        errorMessage: 'SourceOut is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'SourceOut is empty'
+      }
+    },
+    flavor: {
+      isString: {
+        errorMessage: 'Flavor is not a string'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'Flavor is empty'
+      }
+    },
+    targetIn: {
+      isInt: {
+        errorMessage: 'TargetIn is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'TargetIn is empty'
+      }
+    },
+    targetOut: {
+      isInt: {
+        errorMessage: 'TargetOut is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'TargetOut is empty'
+      }
+    }
+  }), async (req, res) => {
+    try {
+      const errors = (0, _check.validationResult)(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array());
+      }
+
+      const {
+        id,
+        title,
+        sourceIn,
+        sourceOut,
+        targetIn,
+        targetOut,
+        flavor
+      } = req.body;
+      console.log(id);
+      const node = await models.Node.findOne({
+        where: {
+          id
+        }
+      });
+
+      if (!node) {
+        return res.status(404).send('Node does not exist');
+      }
+
+      if (req.session.userID !== node.get('userId') && req.session.role !== 'admin') {
+        return res.status(403).send('Not allowed.');
+      }
+
+      const nodeUpdated = await node.update({
+        title
+      });
+
+      if (!nodeUpdated) {
+        return res.status(500).send('Node could not be updated');
+      }
+
+      console.log(id);
+      const connection = await models.Connection.findOne({
+        where: {
+          targetNodeId: id
+        }
+      });
+      console.log(connection);
+
+      if (!connection) {
+        return res.status(404).send('Connection does not exist');
+      }
+
+      const connectionUpdated = await connection.update({
+        sourceIn,
+        sourceOut,
+        targetIn,
+        targetOut,
+        flavor
+      });
+
+      if (!connectionUpdated) {
+        return res.status(500).send('Connection could not be updated');
+      }
+
+      return res.status(200).send({
+        message: 'Node was updated'
+      });
+    } catch (errors) {
+      console.log(errors);
+      return res.status(500).send('');
+    }
+  });
+}
+
+function deleteNode(app, models, checkAuth) {
+  app.delete('/api/node', checkAuth, (0, _check.checkSchema)({
+    id: {
+      isInt: {
+        errorMessage: 'ID is not an integer.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'ID not specified.'
+      }
+    }
+  }), async (req, res) => {
+    try {
+      const errors = (0, _check.validationResult)(req);
+
+      if (!errors.isEmpty()) {
+        return res.status(422).jsonp(errors.array());
+      }
+
+      const {
+        id
+      } = req.body;
+      const node = await models.Node.findOne({
+        where: {
+          id
+        }
+      });
+
+      if (!node) {
+        return res.status(404).send('Flower does not exist');
+      }
+
+      if (req.session.userID !== node.get('userId') && req.session.role !== 'admin') {
+        return res.status(403).send('Not allowed.');
+      }
+
+      const connectionUpdated = await models.Connection.destroy({
+        where: {
+          targetNodeId: id
+        }
+      });
+
+      if (connectionUpdated <= 0) {
+        return res.status(500).send('Connection could not be updated');
+      }
+
+      const nodeDeleted = await models.Node.destroy({
+        where: {
+          id
+        }
+      });
+
+      if (nodeDeleted <= 0) {
+        return res.status(500).send('Node could not be updated');
+      }
+
+      return res.status(200).send({
+        message: 'Node was updated'
       });
     } catch (errors) {
       return res.status(500).send('');

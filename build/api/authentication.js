@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.generateTransporter = generateTransporter;
 exports.loginLink = loginLink;
 exports.login = login;
+exports.logout = logout;
 exports.checkLogin = checkLogin;
 
 var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
@@ -153,12 +154,25 @@ function login(app, models) {
       req.session.userID = user.get('id');
       console.log(req.session.role, user.get('role'), user.get('id'), req.session.id);
       req.session.authenticated = true;
+      req.session.name = user.get('name');
       return res.status(200).send({
-        message: 'Successfully signed in.'
+        message: 'Successfully signed in.',
+        name: user.get('name'),
+        role: user.get('role'),
+        id: user.get('id')
       });
     } catch (error) {
       return res.status(500).send('');
     }
+  });
+}
+
+function logout(app, models) {
+  app.post('api/logout', (req, res) => {
+    req.session.destroy();
+    res.status(200).send({
+      message: 'Successfully logged out.'
+    });
   });
 }
 
@@ -174,7 +188,10 @@ function checkLogin(app, models) {
       });
     } else {
       return res.status(200).send({
-        message: 'Successfully signed in.'
+        message: 'Successfully signed in.',
+        name: session.name,
+        role: session.role,
+        id: session.userID
       });
     }
   });

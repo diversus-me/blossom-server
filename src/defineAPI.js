@@ -1,6 +1,8 @@
-import { createUser, deleteUser } from './api/user'
-import { loginLink, login, checkLogin, generateTransporter } from './api/authentication'
-import { createFlower, addNode, getFlowers, getNode } from './api/flower'
+import { createUser, deleteUser, getUsers } from './api/user'
+import { loginLink, login, checkLogin,
+  generateTransporter, logout } from './api/authentication'
+import { createFlower, addNode, getFlowers, deleteFlower, getNode,
+  editNode, editFlower, deleteNode } from './api/flower'
 import { getVideoLength } from './api/video'
 
 function checkAuth (req, res, next) {
@@ -25,11 +27,17 @@ export default function defineAPI (app, models) {
   checkLogin(app, models)
   loginLink(app, models, tranporter)
   login(app, models)
+  logout(app, models)
 
+  getUsers(app, models, checkAuth, checkAdmin)
   createUser(app, models, checkAuth, checkAdmin)
   deleteUser(app, models, checkAuth, checkAdmin)
 
   createFlower(app, models, checkAuth)
+  deleteFlower(app, models, checkAuth)
+  editFlower(app, models, checkAuth)
   addNode(app, models, checkAuth)
   getNode(app, models)
+  editNode(app, models, checkAuth)
+  deleteNode(app, models, checkAuth)
 }

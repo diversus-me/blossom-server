@@ -65,7 +65,7 @@ export function loginLink (app, models, transporter) {
         subject: 'Login',
         to: email
       }
-      transporter.sendMail(mailOptions, error => {
+      transporter.sendMail(mailOptions, (error) => {
         if (error) {
           return res.status(500).send({ error })
         }
@@ -115,10 +115,18 @@ export function login (app, models) {
       req.session.userID = user.get('id')
       console.log(req.session.role, user.get('role'), user.get('id'), req.session.id)
       req.session.authenticated = true
-      return res.status(200).send({ message: 'Successfully signed in.' })
+      req.session.name = user.get('name')
+      return res.status(200).send({ message: 'Successfully signed in.', name: user.get('name'), role: user.get('role'), id: user.get('id') })
     } catch (error) {
       return res.status(500).send('')
     }
+  })
+}
+
+export function logout (app, models) {
+  app.post('api/logout', (req, res) => {
+    req.session.destroy()
+    res.status(200).send({ message: 'Successfully logged out.' })
   })
 }
 
@@ -128,7 +136,7 @@ export function checkLogin (app, models) {
     if (!session.authenticated) {
       return res.status(403).send({ message: 'Not Logged In' })
     } else {
-      return res.status(200).send({ message: 'Successfully signed in.' })
+      return res.status(200).send({ message: 'Successfully signed in.', name: session.name, role: session.role, id: session.userID })
     }
   })
 }

@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.createUser = createUser;
 exports.deleteUser = deleteUser;
+exports.getUsers = getUsers;
 
 var _check = require("express-validator/check");
 
@@ -24,17 +25,12 @@ function createUser(app, models, checkAuth, checkAdmin) {
     email: {
       isEmail: true,
       errorMessage: 'Invalid Email'
-    },
-    role: {
-      isString: true,
-      errorMessage: 'Invalid Role'
     }
   }), async (req, res) => {
     try {
       const {
         name,
-        email,
-        role
+        email
       } = req.body;
       const errors = (0, _check.validationResult)(req);
 
@@ -60,7 +56,7 @@ function createUser(app, models, checkAuth, checkAdmin) {
         where: {
           name,
           email,
-          role
+          role: 'user'
         },
         defaults: {
           joined: new Date()
@@ -88,7 +84,7 @@ function deleteUser(app, models, checkAuth, checkAdmin) {
     try {
       const {
         email
-      } = req.query;
+      } = req.body;
       const errors = (0, _check.validationResult)(req);
 
       if (!errors.isEmpty()) {
@@ -105,6 +101,10 @@ function deleteUser(app, models, checkAuth, checkAdmin) {
         return res.status(404).send('User does not exists');
       }
 
+      if (user.get('role') === 'admin') {
+        return res.status(403).send('You can not delete admins');
+      }
+
       const rowDeleted = await models.User.destroy({
         where: {
           email
@@ -117,7 +117,26 @@ function deleteUser(app, models, checkAuth, checkAdmin) {
 
       return res.status(200).send('Deleted User');
     } catch (error) {
-      return res.send(500).send('');
+      console.log(error);
+      return res.status(500).send('');
+    }
+  });
+}
+
+function getUsers(app, models, checkAuth, checkAdmin) {
+  app.get('/api/users', checkAuth, checkAdmin, async (req, res) => {
+    try {
+      const users = await models.User.findAll({
+        attributes: ['id', 'name', 'email', 'role']
+      });
+
+      if (!users) {
+        return res.status(500).send('Users not found');
+      }
+
+      return res.status(200).send(users);
+    } catch (error) {
+      return res.status(500).send('');
     }
   });
 }
