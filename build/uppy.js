@@ -5,9 +5,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = getUppy;
 
+var _path = _interopRequireDefault(require("path"));
+
 var _companion = _interopRequireDefault(require("@uppy/companion"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const DATA_DIR = _path.default.join(__dirname, process.env.COMPANION_UPLOAD_FOLDER);
 
 function getUppy() {
   console.log(process.env.COMPANION_AWS_KEY, process.env.COMPANION_AWS_SECRET);
@@ -29,7 +33,7 @@ function getUppy() {
     //   sendSelfEndpoint: 'localhost:3020',
     secret: process.env.COMPANION_SECRET,
     debug: true,
-    filePath: process.env.COMPANION_UPLOAD_FOLDER
+    filePath: DATA_DIR
   };
   return _companion.default.app(options);
 }
