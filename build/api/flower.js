@@ -105,8 +105,8 @@ function getNode(app, models) {
 function deleteFlower(app, models, checkAuth) {
   app.delete('/api/flower', checkAuth, (0, _check.checkSchema)({
     id: {
-      isNumber: {
-        errorMessage: 'id is not a string'
+      isNumeric: {
+        errorMessage: 'id is not a number'
       },
       isEmpty: {
         negated: true,
@@ -161,8 +161,8 @@ function deleteFlower(app, models, checkAuth) {
 function editFlower(app, models, checkAuth) {
   app.patch('/api/flower', checkAuth, (0, _check.checkSchema)({
     id: {
-      isNumber: {
-        errorMessage: 'id is not a string'
+      isNumeric: {
+        errorMessage: 'id is not a number'
       },
       isEmpty: {
         negated: true,

@@ -14,6 +14,8 @@ var _initializeSessions = _interopRequireDefault(require("./sessions/initializeS
 
 var _defineAPI = _interopRequireDefault(require("./defineAPI"));
 
+var _uppy = _interopRequireDefault(require("./uppy"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint-disable import/first */
@@ -48,6 +50,10 @@ app.use(_express.default.urlencoded());
 /* Initiate API */
 
 (0, _defineAPI.default)(app, models);
+app.use((0, _uppy.default)());
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}.`);
+});
+app.listen(3020, () => {
+  console.log(`Server listening at port 3020.`);
 });
