@@ -1,7 +1,7 @@
-import path from 'path'
+// import path from 'path'
 import companion from '@uppy/companion'
 
-const DATA_DIR = path.join(__dirname, process.env.COMPANION_UPLOAD_FOLDER)
+// const DATA_DIR = path.join(__dirname, process.env.COMPANION_UPLOAD_FOLDER)
 
 export default function getUppy () {
   console.log(process.env.COMPANION_AWS_KEY, process.env.COMPANION_AWS_SECRET)
@@ -23,7 +23,7 @@ export default function getUppy () {
     //   sendSelfEndpoint: 'localhost:3020',
     secret: process.env.COMPANION_SECRET,
     debug: true,
-    filePath: DATA_DIR
+    filePath: process.env.COMPANION_UPLOAD_FOLDER
   }
 
   return companion.app(options)
