@@ -8,8 +8,8 @@ export default function getUppy () {
   const options = {
     providerOptions: {
       s3: {
-        //   getKey: (req, filename) =>
-        //     `whatever/${Math.random().toString(32).slice(2)}/${filename}`,
+        getKey: (req, filename) =>
+          `upload/${filename}`,
         key: process.env.COMPANION_AWS_KEY,
         secret: process.env.COMPANION_AWS_SECRET,
         bucket: process.env.COMPANION_AWS_BUCKET,
@@ -22,8 +22,7 @@ export default function getUppy () {
     },
     //   sendSelfEndpoint: 'localhost:3020',
     secret: process.env.COMPANION_SECRET,
-    debug: true,
-    filePath: process.env.COMPANION_UPLOAD_FOLDER
+    debug: true
   }
 
   return companion.app(options)
