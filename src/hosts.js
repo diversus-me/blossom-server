@@ -4,5 +4,6 @@ export const hosts = [
   'https://flower.diversus.me',
   'https://flowerblossom-dev.netlify.com',
   'https://nettz.diversus.me',
+  'https://toa.diversus.me',
   'http://localhost:3000'
 ]
