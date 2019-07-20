@@ -13,6 +13,8 @@ var _flower = require("./api/flower");
 
 var _video = require("./api/video");
 
+var _s = require("./s3/s3");
+
 function checkAuth(req, res, next) {
   if (req.session.authenticated) {
     next();
@@ -47,4 +49,14 @@ function defineAPI(app, models) {
   (0, _flower.getNode)(app, models);
   (0, _flower.editNode)(app, models, checkAuth);
   (0, _flower.deleteNode)(app, models, checkAuth);
+  app.get('/api/uploadLink', async (req, res) => {
+    try {
+      const url = await (0, _s.getPresignedUploadUrl)(`testfile${Math.random() * 1000}00`);
+      res.status(200).send({
+        url
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
 }

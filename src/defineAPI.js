@@ -4,6 +4,7 @@ import { loginLink, login, checkLogin,
 import { createFlower, addNode, getFlowers, deleteFlower, getNode,
   editNode, editFlower, deleteNode } from './api/flower'
 import { getVideoLength } from './api/video'
+import { getPresignedUploadUrl } from './s3/s3'
 
 function checkAuth (req, res, next) {
   if (req.session.authenticated) {
@@ -40,4 +41,13 @@ export default function defineAPI (app, models) {
   getNode(app, models)
   editNode(app, models, checkAuth)
   deleteNode(app, models, checkAuth)
+
+  app.get('/api/uploadLink', async (req, res) => {
+    try {
+      const url = await getPresignedUploadUrl(`testfile${Math.random() * 1000}00`)
+      res.status(200).send({ url })
+    } catch (error) {
+      console.log(error)
+    }
+  })
 }
