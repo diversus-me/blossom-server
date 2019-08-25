@@ -15,11 +15,13 @@ const s3 = new _awsSdk.default.S3({
 });
 
 async function getPresignedUploadUrl(filename) {
-  const key = `upload/${filename}`;
+  const key = `/upload/${filename}`;
   const url = await s3.getSignedUrl('putObject', {
     Bucket: process.env.COMPANION_AWS_BUCKET,
     Key: key,
-    ContentType: 'video/*'
+    Expires: 60,
+    ContentType: 'video/*',
+    ACL: 'public-read'
   });
   return url;
 }

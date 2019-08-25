@@ -9,6 +9,7 @@ import connectPostgres from './postgres/connectPostgres'
 import initPostgres from './postgres/initPostgres'
 import initializeSessions from './sessions/initializeSessions'
 import defineAPI from './defineAPI'
+import uppy from './uppy'
 
 const PORT = process.env.HTTP_PORT || 8081
 const app = express()
@@ -45,6 +46,8 @@ app.use(express.urlencoded())
 
 /* Initiate API */
 defineAPI(app, models)
+
+// app.use(uppy())
 
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}.`)
