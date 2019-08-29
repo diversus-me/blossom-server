@@ -47,7 +47,7 @@ app.use(express.urlencoded())
 /* Initiate API */
 defineAPI(app, models)
 
-// app.use(uppy())
+app.use(uppy())
 
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}.`)

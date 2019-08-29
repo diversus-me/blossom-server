@@ -49,8 +49,8 @@ app.use(_express.default.json());
 app.use(_express.default.urlencoded());
 /* Initiate API */
 
-(0, _defineAPI.default)(app, models); // app.use(uppy())
-
+(0, _defineAPI.default)(app, models);
+app.use((0, _uppy.default)());
 app.listen(PORT, () => {
   console.log(`Server listening at port ${PORT}.`);
 });
