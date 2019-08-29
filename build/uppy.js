@@ -24,7 +24,7 @@ function getUppy() {
       }
     },
     server: {
-      host: process.env.NODE_ENV !== 'production' ? `${process.env.HOST}:${process.env.PORT}` : process.env.HOST,
+      host: process.env.HOST,
       protocol: process.env.NODE_ENV !== 'production' ? 'http' : 'https'
     },
     //   sendSelfEndpoint: 'localhost:3020',
