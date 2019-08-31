@@ -12,7 +12,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // import path from 'path'
 // const DATA_DIR = path.join(__dirname, process.env.COMPANION_UPLOAD_FOLDER)
 function getUppy() {
-  console.log(process.env.COMPANION_AWS_KEY, process.env.COMPANION_AWS_SECRET);
   const options = {
     providerOptions: {
       s3: {
