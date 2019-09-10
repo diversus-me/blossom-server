@@ -110,10 +110,9 @@ export function login (app, models) {
       if (!user) {
         return res.status(403).send({ message: 'User does not exists' })
       }
-
+      console.log(user.get('id'))
       req.session.role = user.get('role')
       req.session.userID = user.get('id')
-      console.log(req.session.role, user.get('role'), user.get('id'), req.session.id)
       req.session.authenticated = true
       req.session.name = user.get('name')
       return res.status(200).send({ message: 'Successfully signed in.', name: user.get('name'), role: user.get('role'), id: user.get('id') })
@@ -132,6 +131,15 @@ export function logout (app, models) {
 
 export function checkLogin (app, models) {
   app.get('/api/checkLogin', (req, res) => {
+    if (process.env.NODE_ENV === 'development') {
+      if (process.env.ROLE) {
+        req.session.role = process.env.ROLE
+        req.session.userID = (process.env.ROLE === 'admin') ? 1 : 2
+        req.session.authenticated = true
+        req.session.name = 'Testuser'
+        return res.status(200).send({ message: 'Successfully signed in.', name: req.session.name, role: req.session.role, id: req.session.userID })
+      }
+    }
     const { session } = req
     if (!session.authenticated) {
       return res.status(403).send({ message: 'Not Logged In' })

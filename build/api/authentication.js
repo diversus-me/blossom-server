@@ -150,9 +150,9 @@ function login(app, models) {
         });
       }
 
+      console.log(user.get('id'));
       req.session.role = user.get('role');
       req.session.userID = user.get('id');
-      console.log(req.session.role, user.get('role'), user.get('id'), req.session.id);
       req.session.authenticated = true;
       req.session.name = user.get('name');
       return res.status(200).send({
@@ -178,6 +178,21 @@ function logout(app, models) {
 
 function checkLogin(app, models) {
   app.get('/api/checkLogin', (req, res) => {
+    if (process.env.NODE_ENV === 'development') {
+      if (process.env.ROLE) {
+        req.session.role = process.env.ROLE;
+        req.session.userID = process.env.ROLE === 'admin' ? 1 : 2;
+        req.session.authenticated = true;
+        req.session.name = 'Testuser';
+        return res.status(200).send({
+          message: 'Successfully signed in.',
+          name: req.session.name,
+          role: req.session.role,
+          id: req.session.userID
+        });
+      }
+    }
+
     const {
       session
     } = req;
