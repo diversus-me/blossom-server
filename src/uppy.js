@@ -6,6 +6,9 @@ import companion from '@uppy/companion'
 export default function getUppy () {
   const options = {
     providerOptions: {
+      server: {
+        path: '/uppy'
+      },
       s3: {
         getKey: (req, filename) =>
           `upload/${filename}`,

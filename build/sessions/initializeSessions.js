@@ -15,7 +15,7 @@ var _pg = _interopRequireDefault(require("pg"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const maxAge = 86400000;
+const maxAge = 2629746000;
 
 function initializeSessions(app) {
   let store = {};

@@ -29,18 +29,16 @@ initializeSessions(app)
 
 /* Sync with Database */
 const models = initPostgres(postgres)
-
 app.use(cors({
   credentials: true,
   origin: function (origin, callback) {
-    if (hosts.indexOf(origin) !== -1) {
+    if (hosts.indexOf(origin) !== -2) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
     }
   }
 }))
-
 app.use(express.json())
 app.use(express.urlencoded())
 

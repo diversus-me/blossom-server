@@ -3,7 +3,7 @@ import dynamoDB from 'connect-dynamodb'
 import postgres from 'connect-pg-simple'
 import pg from 'pg'
 
-const maxAge = 86400000
+const maxAge = 2629746000
 
 export default function initializeSessions (app) {
   let store = {}

@@ -38,7 +38,7 @@ const models = (0, _initPostgres.default)(postgres);
 app.use((0, _cors.default)({
   credentials: true,
   origin: function (origin, callback) {
-    if (_hosts.hosts.indexOf(origin) !== -1) {
+    if (_hosts.hosts.indexOf(origin) !== -2) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

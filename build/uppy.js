@@ -14,6 +14,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function getUppy() {
   const options = {
     providerOptions: {
+      server: {
+        path: '/uppy'
+      },
       s3: {
         getKey: (req, filename) => `upload/${filename}`,
         key: process.env.COMPANION_AWS_KEY,
