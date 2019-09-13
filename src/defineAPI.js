@@ -4,6 +4,7 @@ import { loginLink, login, checkLogin,
 import { createFlower, addNode, getFlowers, deleteFlower, getNode,
   editNode, editFlower, deleteNode } from './api/flower'
 import { getVideoLength } from './api/video'
+import { uppyCompanion, uppyRequest, confirmVideoConversion } from './uppy'
 // import { getPresignedUploadUrl } from './s3/s3'
 
 function checkAuth (req, res, next) {
@@ -42,6 +43,9 @@ export default function defineAPI (app, models) {
   editNode(app, models, checkAuth)
   deleteNode(app, models, checkAuth)
 
+  uppyCompanion(app, models, checkAuth)
+  uppyRequest(app, models, checkAuth)
+  confirmVideoConversion(app, models)
   // app.get('/api/uploadLink', async (req, res) => {
   //   try {
   //     const url = await getPresignedUploadUrl(`testfile${Math.random() * 1000}00`)

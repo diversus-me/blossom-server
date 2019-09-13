@@ -31,7 +31,8 @@
     "nodemailer": "^6.3.0",
     "pg": "^7.11.0",
     "pg-promise": "^8.7.5",
-    "sequelize": "^5.10.1"
+    "sequelize": "^5.10.1",
+    "shortid": "^2.2.15"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",

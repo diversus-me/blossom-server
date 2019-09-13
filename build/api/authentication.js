@@ -150,7 +150,6 @@ function login(app, models) {
         });
       }
 
-      console.log(user.get('id'));
       req.session.role = user.get('role');
       req.session.userID = user.get('id');
       req.session.authenticated = true;

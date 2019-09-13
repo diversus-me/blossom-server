@@ -110,7 +110,6 @@ export function login (app, models) {
       if (!user) {
         return res.status(403).send({ message: 'User does not exists' })
       }
-      console.log(user.get('id'))
       req.session.role = user.get('role')
       req.session.userID = user.get('id')
       req.session.authenticated = true
