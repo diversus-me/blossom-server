@@ -98,15 +98,16 @@ function uppyCompanion(app, models, checkAuth) {
     },
     //   sendSelfEndpoint: 'localhost:3020',
     secret: process.env.COMPANION_SECRET,
-    debug: true // app.use('/uppy', checkAuth)
+    debug: true
+  }; // app.use('/uppy', checkAuth)
+  // app.use('/uppy', checkVideoID(models))
 
-  };
-  app.use('/uppy', checkVideoID(models));
   app.use('/uppy', _companion.default.app(options));
 }
 
 function confirmVideoConversion(app, models) {
   app.post('/confirmVideoConversion', (req, res) => {
+    console.log(req);
     return res.status(200).send();
   });
 }

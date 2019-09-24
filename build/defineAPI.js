@@ -15,7 +15,6 @@ var _video = require("./api/video");
 
 var _uppy = require("./uppy");
 
-// import { getPresignedUploadUrl } from './s3/s3'
 function checkAuth(req, res, next) {
   if (req.session.authenticated) {
     next();
