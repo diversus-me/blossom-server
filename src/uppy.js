@@ -91,7 +91,7 @@ export function uppyCompanion (app, models, checkAuth) {
   }
 
   // app.use('/uppy', checkAuth)
-  app.use('/uppy', checkVideoID(models))
+  // app.use('/uppy', checkVideoID(models))
   app.use('/uppy', companion.app(options))
 }
 
