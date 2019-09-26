@@ -74,7 +74,7 @@ export function uppyCompanion (app, models, checkAuth) {
       },
       s3: {
         getKey: (req, filename) =>
-          `upload/${req.videoURL}.${req.filetype}`,
+          `upload/${filename}`,
         key: process.env.COMPANION_AWS_KEY,
         secret: process.env.COMPANION_AWS_SECRET,
         bucket: process.env.COMPANION_AWS_BUCKET,
