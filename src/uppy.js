@@ -97,7 +97,7 @@ export function uppyCompanion (app, models, checkAuth) {
 
 export function confirmVideoConversion (app, models) {
   app.post('/confirmVideoConversion', (req, res) => {
-    console.log(req.headers.origin)
+    console.log(req.body)
     return res.status(200).send()
   })
 }
