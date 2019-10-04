@@ -18,19 +18,15 @@ _shortid.default.seed(process.env.IDSEED);
 function checkVideoID(models) {
   return async (req, res, next) => {
     try {
-      const user = await models.User.findOne({
-        where: {
-          id: req.query.filename.split('.')[0]
-        }
-      });
+      const url = req.query.filename.split('.')[0];
 
-      if (!user) {
-        return res.status(404).send('User not found.');
+      if (!_shortid.default.isValid(url)) {
+        return res.status(400).send('ID not found.');
       }
 
       const video = await models.Video.findOne({
         where: {
-          id: req.query.filename.split('.')[1],
+          url,
           duration: 0
         }
       });
@@ -40,10 +36,10 @@ function checkVideoID(models) {
       }
 
       req.videoURL = video.get('url');
-      req.filetype = req.query.filename.split('.')[2];
+      req.filetype = req.query.filename.split('.')[1];
       next();
     } catch (error) {
-      res.status(500).send();
+      return res.status(500).send();
     }
   };
 }
@@ -67,7 +63,7 @@ function uppyRequest(app, models, checkAuth) {
         url: _shortid.default.generate(),
         duration: 0
       });
-      const videoID = video.get('id');
+      const videoID = video.get('url');
       return res.status(200).send({
         videoID
       });
@@ -96,12 +92,11 @@ function uppyCompanion(app, models, checkAuth) {
       host: process.env.HOST,
       protocol: process.env.NODE_ENV !== 'production' ? 'http' : 'https'
     },
-    //   sendSelfEndpoint: 'localhost:3020',
     secret: process.env.COMPANION_SECRET,
     debug: true
   }; // app.use('/uppy', checkAuth)
-  // app.use('/uppy', checkVideoID(models))
 
+  app.use('/uppy', checkVideoID(models));
   app.use('/uppy', _companion.default.app(options));
 }
 
