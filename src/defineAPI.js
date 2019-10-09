@@ -1,9 +1,13 @@
 import { createUser, deleteUser, getUsers } from './api/user'
-import { loginLink, login, checkLogin,
-  generateTransporter, logout } from './api/authentication'
-import { createFlower, addNode, getFlowers, deleteFlower, getNode,
-  editNode, editFlower, deleteNode } from './api/flower'
-import { getVideoLength } from './api/video'
+import {
+  loginLink, login, checkLogin,
+  generateTransporter, logout
+} from './api/authentication'
+import {
+  createFlower, addNode, getFlowers, deleteFlower, getNode,
+  editNode, editFlower, deleteNode
+} from './api/flower'
+import { getVideoMeta } from './api/video'
 import { uppyCompanion, uppyRequest, confirmVideoConversion } from './uppy'
 // import { getPresignedUploadUrl } from './s3/s3'
 
@@ -23,7 +27,7 @@ function checkAdmin (req, res, next) {
 
 export default function defineAPI (app, models) {
   getFlowers(app, models)
-  getVideoLength(app, models)
+  getVideoMeta(app, models)
 
   const tranporter = generateTransporter()
   checkLogin(app, models)

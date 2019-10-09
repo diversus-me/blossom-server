@@ -33,7 +33,7 @@ function checkAdmin(req, res, next) {
 
 function defineAPI(app, models) {
   (0, _flower.getFlowers)(app, models);
-  (0, _video.getVideoLength)(app, models);
+  (0, _video.getVideoMeta)(app, models);
   const tranporter = (0, _authentication.generateTransporter)();
   (0, _authentication.checkLogin)(app, models);
   (0, _authentication.loginLink)(app, models, tranporter);

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getVideoLength = getVideoLength;
+exports.getVideoMeta = getVideoMeta;
 
 var _nodeFetch = _interopRequireDefault(require("node-fetch"));
 
@@ -16,19 +16,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // eslint-disable-line no-unused-vars
 const getVideoId = require('get-video-id');
 
-function getVideoLength(app, models) {
-  app.get('/api/videoLength', (req, res) => {
+function getVideoMeta(app, models) {
+  app.get('/api/videoMeta', (req, res) => {
     const vidId = getVideoId(req.query.videolink).id;
 
     if (!vidId) {
       return res.status(424).send('Video not found');
     }
 
-    (0, _nodeFetch.default)(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`).then(checkStatus).then(body => {
+    (0, _nodeFetch.default)(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,snippet&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`).then(checkStatus).then(body => {
       if (!body.items[0]) {
         throw Error('Video not found');
       } else {
         const duration = body.items[0].contentDetails.duration;
+        const snippet = body.items[0].snippet;
+        console.log(body.items[0]);
 
         const parsedDuration = _moment.default.duration(duration).format('s', {
           trim: false,
@@ -36,7 +38,8 @@ function getVideoLength(app, models) {
         });
 
         res.status(200).send({
-          duration: parsedDuration
+          duration: parsedDuration,
+          title: snippet.title
         });
       }
     }).catch(error => {
