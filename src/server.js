@@ -38,6 +38,7 @@ app.use(cors({
     }
   }
 }))
+
 app.use(express.json())
 app.use(express.urlencoded())
 
@@ -49,5 +50,5 @@ app.listen(PORT, () => {
 })
 
 app.listen(3020, () => {
-  console.log(`Server listening at port 3020.`)
+  console.log('Server listening at port 3020.')
 })

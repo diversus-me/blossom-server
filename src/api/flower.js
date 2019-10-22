@@ -1,5 +1,6 @@
 import { checkSchema, validationResult } from 'express-validator/check'
 import fetch from 'node-fetch'
+import Sequelize from 'sequelize'
 import moment from 'moment'
 import momentDurationFormat from 'moment-duration-format' // eslint-disable-line no-unused-vars
 const getVideoId = require('get-video-id')
@@ -8,7 +9,7 @@ export function getFlowers (app, models) {
   app.get('/api/allFlowers', async (req, res) => {
     try {
       const flowers = await models.Flower.findAll({
-        attributes: [ 'title', 'description', 'created', 'id' ],
+        attributes: ['title', 'description', 'created', 'id'],
         include: [{
           model: models.User,
           attributes: ['id', 'name']
@@ -23,8 +24,18 @@ export function getFlowers (app, models) {
         }
         ]
       })
+      // const node = await models.Connection.findAll({
+      //   where: {
+      //     id: req.params.uid
+      //   },
+      //   attributes: [
+      //     'created', 'flavor', 'id', 'sourceIn', 'sourceOut', 'targetIn', 'targetOut'
+      //   ]
+      // })
+
       return res.status(200).send({ data: flowers })
     } catch (error) {
+      console.log(error)
       return res.status(500).send('')
     }
   })
@@ -130,7 +141,6 @@ export function deleteFlower (app, models, checkAuth) {
 
       return res.status(200).send({ message: 'Flower was deleted' })
     } catch (error) {
-      console.log(error)
       return res.status(500).send('')
     }
   })
@@ -463,6 +473,7 @@ export function addNode (app, models, checkAuth) {
 
       return res.status(200).send({ message: 'Node was created' })
     } catch (errors) {
+      console.log(errors)
       return res.status(500).send('')
     }
   })

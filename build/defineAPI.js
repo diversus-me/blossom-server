@@ -13,22 +13,20 @@ var _flower = require("./api/flower");
 
 var _video = require("./api/video");
 
-var _uppy = require("./uppy");
-
 function checkAuth(req, res, next) {
   if (req.session.authenticated) {
     next();
+  } else {
+    return res.status(403).send();
   }
-
-  return res.status(403);
 }
 
 function checkAdmin(req, res, next) {
   if (req.session.role && req.session.role === 'admin') {
     next();
+  } else {
+    return res.status(403).send();
   }
-
-  return res.status(403);
 }
 
 function defineAPI(app, models) {
@@ -48,10 +46,10 @@ function defineAPI(app, models) {
   (0, _flower.addNode)(app, models, checkAuth);
   (0, _flower.getNode)(app, models);
   (0, _flower.editNode)(app, models, checkAuth);
-  (0, _flower.deleteNode)(app, models, checkAuth);
-  (0, _uppy.uppyCompanion)(app, models, checkAuth);
-  (0, _uppy.uppyRequest)(app, models, checkAuth);
-  (0, _uppy.confirmVideoConversion)(app, models); // app.get('/api/uploadLink', async (req, res) => {
+  (0, _flower.deleteNode)(app, models, checkAuth); // uppyCompanion(app, models, checkAuth)
+  // uppyRequest(app, models, checkAuth)
+  // confirmVideoConversion(app, models)
+  // app.get('/api/uploadLink', async (req, res) => {
   //   try {
   //     const url = await getPresignedUploadUrl(`testfile${Math.random() * 1000}00`)
   //     res.status(200).send({ url })

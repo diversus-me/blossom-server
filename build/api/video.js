@@ -30,7 +30,6 @@ function getVideoMeta(app, models) {
       } else {
         const duration = body.items[0].contentDetails.duration;
         const snippet = body.items[0].snippet;
-        console.log(body.items[0]);
 
         const parsedDuration = _moment.default.duration(duration).format('s', {
           trim: false,

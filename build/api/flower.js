@@ -16,6 +16,8 @@ var _check = require("express-validator/check");
 
 var _nodeFetch = _interopRequireDefault(require("node-fetch"));
 
+var _sequelize = _interopRequireDefault(require("sequelize"));
+
 var _moment = _interopRequireDefault(require("moment"));
 
 var _momentDurationFormat = _interopRequireDefault(require("moment-duration-format"));
@@ -41,11 +43,20 @@ function getFlowers(app, models) {
             attributes: ['url', 'type', 'uploaded', 'duration']
           }]
         }]
-      });
+      }); // const node = await models.Connection.findAll({
+      //   where: {
+      //     id: req.params.uid
+      //   },
+      //   attributes: [
+      //     'created', 'flavor', 'id', 'sourceIn', 'sourceOut', 'targetIn', 'targetOut'
+      //   ]
+      // })
+
       return res.status(200).send({
         data: flowers
       });
     } catch (error) {
+      console.log(error);
       return res.status(500).send('');
     }
   });
@@ -152,7 +163,6 @@ function deleteFlower(app, models, checkAuth) {
         message: 'Flower was deleted'
       });
     } catch (error) {
-      console.log(error);
       return res.status(500).send('');
     }
   });
@@ -521,6 +531,7 @@ function addNode(app, models, checkAuth) {
         message: 'Node was created'
       });
     } catch (errors) {
+      console.log(errors);
       return res.status(500).send('');
     }
   });

@@ -18,7 +18,6 @@ export function getVideoMeta (app, models) {
         } else {
           const duration = body.items[0].contentDetails.duration
           const snippet = body.items[0].snippet
-          console.log(body.items[0])
           const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
           res.status(200).send({
             duration: parsedDuration,

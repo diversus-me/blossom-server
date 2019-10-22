@@ -177,36 +177,34 @@ function logout(app, models) {
 
 function checkLogin(app, models) {
   app.get('/api/checkLogin', (req, res) => {
-    if (process.env.NODE_ENV === 'development') {
-      if (process.env.ROLE) {
-        req.session.role = process.env.ROLE;
-        req.session.userID = process.env.ROLE === 'admin' ? 1 : 2;
-        req.session.authenticated = true;
-        req.session.name = 'Testuser';
-        return res.status(200).send({
-          message: 'Successfully signed in.',
-          name: req.session.name,
-          role: req.session.role,
-          id: req.session.userID
-        });
-      }
-    }
-
-    const {
-      session
-    } = req;
-
-    if (!session.authenticated) {
-      return res.status(403).send({
-        message: 'Not Logged In'
-      });
-    } else {
+    if (process.env.NODE_ENV === 'development' && process.env.ROLE) {
+      req.session.role = process.env.ROLE;
+      req.session.userID = process.env.ROLE === 'admin' ? 1 : 2;
+      req.session.authenticated = true;
+      req.session.name = 'Testuser';
       return res.status(200).send({
         message: 'Successfully signed in.',
-        name: session.name,
-        role: session.role,
-        id: session.userID
+        name: req.session.name,
+        role: req.session.role,
+        id: req.session.userID
       });
+    } else {
+      const {
+        session
+      } = req;
+
+      if (!session.authenticated) {
+        return res.status(403).send({
+          message: 'Not Logged In'
+        });
+      } else {
+        return res.status(200).send({
+          message: 'Successfully signed in.',
+          name: session.name,
+          role: session.role,
+          id: session.userID
+        });
+      }
     }
   });
 }
