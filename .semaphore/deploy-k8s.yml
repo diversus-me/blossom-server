@@ -9,7 +9,7 @@ blocks:
     task:
       secrets:
         - name: dockerhub
-        - name: do-access-token
+        - name: do_access_token
         - name: env-production
       env_vars:
         - name: CLUSTER_NAME

@@ -56,10 +56,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: addressbook-lb
+  name: timserver-lb
 spec:
   selector:
-    app: addressbook
+    app: timserver
   type: LoadBalancer
   ports:
     - port: 80
