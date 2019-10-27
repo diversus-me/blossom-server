@@ -19,25 +19,7 @@ blocks:
           commands:
             - cache restore
             - npm install
-            - cache store 
-  - name: Tests
-    task:
-      env_vars:
-        - name: NODE_ENV
-          value: test
-      prologue:
-        commands:
-          - checkout
-          - nvm use
-          - cache restore
-      jobs:
-        - name: Static test
-          commands:
-            - npm run lint
-        - name: Unit test
-          commands:
-            - sem-service start postgres
-            - npm run test
+            - cache store
 promotions:
   - name: Dockerize
     pipeline_file: docker-build.yml
