@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: timserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: timserver
+  template:
+    metadata:
+      labels:
+        app: timserver
+    spec:
+      containers:
+        - name: timserver
+          image: ${DOCKER_USERNAME}/timserver:${SEMAPHORE_WORKFLOW_ID}
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: HTTP_PORT
+              value: "$HTTP_PORT"
+            - name: HOST
+              value: "$HOST"
+            - name: JWT_SECRET
+              value: "$JWT_SECRET"
+            - name: COOKIE_SECRET
+              value: "$COOKIE_SECRET"
+            - name: IDSEED
+              value: "$IDSEED"
+            - name: RDS_DB_NAME
+              value: "$RDS_DB_NAME"
+            - name: RDS_USERNAME
+              value: "$RDS_USERNAME"
+            - name: RDS_PASSWORD
+              value: "$RDS_PASSWORD"
+            - name: RDS_HOSTNAME
+              value: "$RDS_HOSTNAME"
+            - name: RDS_PORT
+              value: "$RDS_PORT"
+            - name: RDS_SSL
+              value: "$RDS_SSL"
+            - name: EMAIL_USER
+              value: "$EMAIL_USER"
+            - name: EMAIL_PASSWORD
+              value: "$EMAIL_PASSWORD"
+            - name: EMAIL_HOST
+              value: "$EMAIL_HOST"
+            - name: EMAIL_PORT
+              value: "$EMAIL_PORT"
+            - name: YOUTUBE_API_KEY
+              value: "$YOUTUBE_API_KEY"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: addressbook-lb
+spec:
+  selector:
+    app: addressbook
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 3000

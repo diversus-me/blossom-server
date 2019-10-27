@@ -19,3 +19,8 @@ blocks:
           - docker pull "${DOCKER_USERNAME}/timserver:latest" || true
           - docker build --cache-from "${DOCKER_USERNAME}/timserver:latest" -t "${DOCKER_USERNAME}/timserver:$SEMAPHORE_WORKFLOW_ID" .
           - docker push "${DOCKER_USERNAME}/timserver:$SEMAPHORE_WORKFLOW_ID"
+promotions:
+  - name: Deploy to Kubernetes
+    pipeline_file: deploy-k8s.yml
+    auto_promote_on:
+      - result: passed
