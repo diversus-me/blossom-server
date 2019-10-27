@@ -12,6 +12,6 @@ coverage
 # Other file
 .DS_Store
 
-# build - TODO: currently the build process failes with AWS Code Pipeline, this is needed until Travis is configured.
-# build/
+# build
+build/
 
