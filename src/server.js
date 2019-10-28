@@ -4,6 +4,7 @@ require('dotenv').config()
 import express from 'express'
 import cors from 'cors'
 
+console.log(process.env.NODE_ENV)
 import { hosts } from './hosts'
 import connectPostgres from './postgres/connectPostgres'
 import initPostgres from './postgres/initPostgres'

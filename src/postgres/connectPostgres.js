@@ -1,5 +1,5 @@
 import Sequelize from 'sequelize'
-
+console.log(process.env.NODE_ENV)
 export default function connectPostgres () {
   return new Sequelize(
     process.env.RDS_DB_NAME,
