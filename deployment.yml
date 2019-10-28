@@ -27,7 +27,7 @@ spec:
             - name: COOKIE_SECRET
               value: "$COOKIE_SECRET"
             - name: IDSEED
-              value: "$IDSEED"
+              value: "TESTTEST"
             - name: RDS_DB_NAME
               value: "$RDS_DB_NAME"
             - name: RDS_USERNAME
