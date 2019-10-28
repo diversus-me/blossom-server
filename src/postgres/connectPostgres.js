@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize'
 console.log(process.env.NODE_ENV)
 export default function connectPostgres () {
-  console.log(process.env.RDS_PORT)
+  console.log(process.env)
   return new Sequelize(
     process.env.RDS_DB_NAME,
     process.env.RDS_USERNAME,
