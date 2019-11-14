@@ -235,7 +235,7 @@ export function createFlower (app, models, checkAuth) {
         errorMessage: 'Type is empty'
       },
       custom: {
-        options: value => (value === 'youtube'),
+        options: value => (value === 'vimeo'),
         errorMessage: 'Type is not supported'
       }
     },
@@ -273,25 +273,28 @@ export function createFlower (app, models, checkAuth) {
         return res.status(404).send('User not found.')
       }
 
+      // const vidId = getVideoId(link).id
+      // const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
+      // const body = await checkStatus(response)
+
+      // if (!body.items[0]) {
+      //   return res.status(422).send('Video not found')
+      // }
       const vidId = getVideoId(link).id
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-      const body = await checkStatus(response)
+      const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      const json = await response.json()
 
-      if (!body.items[0]) {
-        return res.status(422).send('Video not found')
-      }
-
-      const duration = body.items[0].contentDetails.duration
-      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      const duration = json[0].duration
       const video = await models.Video.create({
         type,
         userId: user.get('id'),
         url: vidId,
-        duration: parsedDuration
+        duration
       })
 
       const node = await models.Node.create({
         title,
+        description,
         videoId: video.get('id'),
         userId: user.get('id'),
         created: new Date()
@@ -337,6 +340,15 @@ export function addNode (app, models, checkAuth) {
         errorMessage: 'Title not specified.'
       }
     },
+    description: {
+      isString: {
+        errorMessage: 'Title is not a string.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'Title not specified.'
+      }
+    },
     type: {
       isString: {
         errorMessage: 'Type is not a string'
@@ -346,7 +358,7 @@ export function addNode (app, models, checkAuth) {
         errorMessage: 'Type is empty'
       },
       custom: {
-        options: value => (value === 'youtube'),
+        options: value => (value === 'vimeo'),
         errorMessage: 'Type is not supported'
       }
     },
@@ -419,7 +431,7 @@ export function addNode (app, models, checkAuth) {
         return res.status(422).jsonp(errors.array())
       }
 
-      const { id, title, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
+      const { id, title, description, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
 
       const user = await models.User.findOne({
         where: {
@@ -432,24 +444,20 @@ export function addNode (app, models, checkAuth) {
       }
 
       const vidId = getVideoId(link).id
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-      const body = await checkStatus(response)
+      const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      const json = await response.json()
 
-      if (!body.items[0]) {
-        return res.status(422).send('Video not found')
-      }
-
-      const duration = body.items[0].contentDetails.duration
-      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      const duration = json[0].duration
       const video = await models.Video.create({
         type,
         userId: user.get('id'),
         url: vidId,
-        duration: parsedDuration
+        duration
       })
 
       const node = await models.Node.create({
         title,
+        description,
         videoId: video.get('id'),
         userId: user.get('id'),
         created: new Date()
@@ -461,6 +469,7 @@ export function addNode (app, models, checkAuth) {
         targetIn,
         targetOut,
         flavor,
+        claps: 0,
         userId: user.get('id'),
         targetNodeId: node.get('id'),
         nodeId: id,

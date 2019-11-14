@@ -11,8 +11,6 @@ import initPostgres from './postgres/initPostgres'
 import initializeSessions from './sessions/initializeSessions'
 import defineAPI from './defineAPI'
 
-console.log(process.env.NODE_ENV)
-
 const PORT = process.env.HTTP_PORT || 8081
 const app = express()
 
@@ -51,7 +49,3 @@ defineAPI(app, models)
 app.listen(PORT, () => {
   console.log(`Server listening in at port ${PORT}.`)
 })
-
-// app.listen(3020, () => {
-//   console.log('Server listening at port 3020.')
-// })

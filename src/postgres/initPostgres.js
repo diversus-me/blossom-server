@@ -45,6 +45,10 @@ export default function initDatabase (database) {
       type: Sequelize.STRING,
       allowNull: false
     },
+    description: {
+      type: Sequelize.TEXT,
+      allowNull: true
+    },
     created: {
       type: Sequelize.DATE,
       defaultValue: Sequelize.NOW
@@ -93,6 +97,10 @@ export default function initDatabase (database) {
     },
     flavor: {
       type: Sequelize.STRING,
+      allowNull: false
+    },
+    claps: {
+      type: Sequelize.INTEGER,
       allowNull: false
     }
   })

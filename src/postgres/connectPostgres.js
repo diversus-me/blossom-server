@@ -1,7 +1,6 @@
 import Sequelize from 'sequelize'
-console.log(process.env.NODE_ENV)
+
 export default function connectPostgres () {
-  console.log(process.env)
   return new Sequelize(
     process.env.RDS_DB_NAME,
     process.env.RDS_USERNAME,
@@ -11,7 +10,7 @@ export default function connectPostgres () {
       port: process.env.RDS_PORT,
       dialect: 'postgres',
       dialectOptions: {
-        ssl: process.env.RDS_SSL == "true"
+        ssl: process.env.RDS_SSL === 'true'
       }
     }
   )

@@ -8,8 +8,11 @@ import {
   editNode, editFlower, deleteNode
 } from './api/flower'
 import { getVideoMeta } from './api/video'
-// import { uppyCompanion, uppyRequest, confirmVideoConversion } from './uppy'
-// import { getPresignedUploadUrl } from './s3/s3'
+
+import { Vimeo } from 'vimeo'
+import multer from 'multer'
+import fs from 'fs'
+import FileReader from 'filereader'
 
 function checkAuth (req, res, next) {
   if (req.session.authenticated) {
@@ -49,15 +52,34 @@ export default function defineAPI (app, models) {
   editNode(app, models, checkAuth)
   deleteNode(app, models, checkAuth)
 
-  // uppyCompanion(app, models, checkAuth)
-  // uppyRequest(app, models, checkAuth)
-  // confirmVideoConversion(app, models)
-  // app.get('/api/uploadLink', async (req, res) => {
-  //   try {
-  //     const url = await getPresignedUploadUrl(`testfile${Math.random() * 1000}00`)
-  //     res.status(200).send({ url })
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // })
+  const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
+
+  const upload = multer({
+    limits: { fieldSize: 25 * 1024 * 1024 }
+  })
+
+  app.post('/api/uploadLink', upload.single('video'), async (req, res) => {
+    fs.writeFile(req.body.fname + '.mkv', req.file.buffer, function (err) {
+      if (err) {
+        console.log('File Write:', err)
+      } else {
+        console.log('Successfully written File', err)
+      }
+
+      client.upload(
+        req.body.fname + '.mkv',
+        function (uri) {
+          console.log('File upload completed. Your Vimeo URI is:', uri)
+          res.status(200).send({ uri })
+        },
+        function (bytesUploaded, bytesTotal) {
+          var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
+          console.log(bytesUploaded, bytesTotal, percentage + '%')
+        },
+        function (error) {
+          console.log('Failed because: ' + error)
+        }
+      )
+    })
+  })
 }
