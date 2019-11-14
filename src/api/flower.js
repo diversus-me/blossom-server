@@ -221,6 +221,15 @@ export function createFlower (app, models, checkAuth) {
         errorMessage: 'Title is empty'
       }
     },
+    duration: {
+      isInteger: {
+        errorMessage: 'Duration is not a integer'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'duration is empty'
+      }
+    },
     description: {
       isString: {
         errorMessage: 'Description is not a string'
@@ -263,7 +272,7 @@ export function createFlower (app, models, checkAuth) {
         return res.status(422).jsonp(errors.array())
       }
 
-      const { title, description, type, link } = req.body
+      const { title, description, type, link, duration } = req.body
       const user = await models.User.findOne({
         where: {
           id: req.session.userID
@@ -281,10 +290,10 @@ export function createFlower (app, models, checkAuth) {
       //   return res.status(422).send('Video not found')
       // }
       const vidId = getVideoId(link).id
-      const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
-      const json = await response.json()
+      // const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      // const json = await response.json()
 
-      const duration = json[0].duration
+      // const duration = json[0].duration
       const video = await models.Video.create({
         type,
         userId: user.get('id'),
@@ -329,6 +338,15 @@ export function addNode (app, models, checkAuth) {
       isEmpty: {
         negated: true,
         errorMessage: 'ID not specified.'
+      }
+    },
+    duration: {
+      isInteger: {
+        errorMessage: 'Duration is not a integer'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'duration is empty'
       }
     },
     title: {
@@ -431,7 +449,7 @@ export function addNode (app, models, checkAuth) {
         return res.status(422).jsonp(errors.array())
       }
 
-      const { id, title, description, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
+      const { id, title, description, duration, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
 
       const user = await models.User.findOne({
         where: {
@@ -444,10 +462,10 @@ export function addNode (app, models, checkAuth) {
       }
 
       const vidId = getVideoId(link).id
-      const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
-      const json = await response.json()
+      // const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      // const json = await response.json()
 
-      const duration = json[0].duration
+      // const duration = json[0].duration
       const video = await models.Video.create({
         type,
         userId: user.get('id'),
