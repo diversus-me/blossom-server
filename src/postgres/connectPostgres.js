@@ -11,7 +11,8 @@ export default function connectPostgres () {
       dialect: 'postgres',
       dialectOptions: {
         ssl: process.env.RDS_SSL === 'true'
-      }
+      },
+      logging: false
     }
   )
 }
