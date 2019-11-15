@@ -6,6 +6,7 @@ const maxAge = 2629746000
 
 export default function initializeSessions (app) {
   let store = {}
+  console.log('DAS IST EINE KONSOLENAUSGABE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
   console.log(process.env.SESSION_HOST)
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
