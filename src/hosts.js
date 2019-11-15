@@ -1,9 +1,6 @@
 export const hosts = [
   `${process.env.HOST}`,
-  'https://flower.dev.diversus.me',
-  'https://flower.diversus.me',
-  'https://flowerblossom-dev.netlify.com',
-  'https://nettz.diversus.me',
-  'https://toa.diversus.me',
+  'https://timz.io',
+  'https://www.timz.io',
   'http://localhost:3000'
 ]
