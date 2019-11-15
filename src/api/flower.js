@@ -222,7 +222,7 @@ export function createFlower (app, models, checkAuth) {
       }
     },
     duration: {
-      isInteger: {
+      isNumber: {
         errorMessage: 'Duration is not a integer'
       },
       isEmpty: {
@@ -341,7 +341,7 @@ export function addNode (app, models, checkAuth) {
       }
     },
     duration: {
-      isInteger: {
+      isNumber: {
         errorMessage: 'Duration is not a integer'
       },
       isEmpty: {
