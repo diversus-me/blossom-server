@@ -11,7 +11,7 @@ export default function initializeSessions (app) {
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
 
-    const client = redis.createClient(process.env.SESSION_PORT, process.env.SESSION_HOST, { auth_pass: process.env.SESSION_PASSWORD })
+    const client = redis.createClient(process.env.SESSION_PORT, process.env.SESSION_HOST, { auth_pass: process.env.SESSION_PASSWORD, tls: { servername: process.env.SESSION_HOST } })
     client.auth(process.env.SESSION_PASSWORD)
     client.on('error', function (err) {
       console.log('Redis Error ' + err)
