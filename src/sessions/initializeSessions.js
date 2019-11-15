@@ -6,13 +6,14 @@ const maxAge = 2629746000
 
 export default function initializeSessions (app) {
   let store = {}
+  console.log(process.env.SESSION_HOST)
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
-    const client = redis.createClient({
-      host: process.env.SESSION_HOST,
-      port: process.env.SESSION_PORT,
-      password: process.env.SESSION_PASSWORD,
-      user: process.env.SESSION_USER
+
+    const client = redis.createClient(process.env.SESSION_PORT, process.env.SESSION_HOST, { auth_pass: process.env.SESSION_PASSWORD, tls: { servername: process.env.SESSION_HOST } })
+    client.auth(process.env.SESSION_PASSWORD)
+    client.on('error', function (err) {
+      console.log('Redis Error ' + err)
     })
     app.use(session({
       store: new RedisStore({
