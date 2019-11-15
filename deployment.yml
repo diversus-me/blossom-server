@@ -52,6 +52,19 @@ spec:
               value: "$YOUTUBE_API_KEY"
             - name: SESSION_HOST
               value: "$SESSION_HOST"
+            - name: SESSION_USER
+              value: "$SESSION_USER"
+            - name: SESSION_PORT
+              value: "$SESSION_PORT"
+            - name: SESSION_PASSWORD
+              value: "$SESSION_PASSWORD"
+            - name: VIMEO_CLIENT_ID
+              value: "$VIMEO_CLIENT_ID"
+            - name: VIMEO_CLIENT_SECRET
+              value: "$VIMEO_CLIENT_SECRET"
+            - name: VIMEO_TOKEN
+              value: "$VIMEO_TOKEN"
+
 
 ---
 
