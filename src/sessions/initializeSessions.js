@@ -8,15 +8,14 @@ export default function initializeSessions (app) {
   let store = {}
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
-    const client = redis.createClient({
-      host: process.env.SESSION_HOST,
-      port: process.env.SESSION_PORT,
-      password: process.env.SESSION_PASSWORD,
-      user: process.env.SESSION_USER
-    })
+    const client = redis.createClient()
     app.use(session({
       store: new RedisStore({
-        client
+        client,
+        host: process.env.SESSION_HOST,
+        port: process.env.SESSION_PORT,
+        password: process.env.SESSION_PASSWORD,
+        user: process.env.SESSION_USER
       }),
       secret: process.env.COOKIE_SECRET,
       key: 'user_sid',
