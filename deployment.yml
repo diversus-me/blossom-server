@@ -50,6 +50,8 @@ spec:
               value: "$EMAIL_PORT"
             - name: YOUTUBE_API_KEY
               value: "$YOUTUBE_API_KEY"
+            - name: SESSION_HOST
+              value: "$SESSION_HOST"
 
 ---
 
