@@ -6,6 +6,7 @@ const maxAge = 2629746000
 
 console.log(process.env.SESSION_HOST)
 console.log(process.env.VIMEO_CLIENT_ID)
+console.log(process.env)
 
 export default function initializeSessions (app) {
   let store = {}
