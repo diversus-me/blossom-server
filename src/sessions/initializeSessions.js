@@ -15,8 +15,8 @@ export default function initializeSessions (app) {
       process.env.SESSION_PORT, process.env.SESSION_HOST,
       {
         auth_pass: process.env.SESSION_PASSWORD,
-        password: process.env.SESSION_PASSWORD,
-        tls: { servername: process.env.SESSION_HOST }
+        password: process.env.SESSION_PASSWORD
+        // tls: { servername: process.env.SESSION_HOST }
       })
     client.auth(process.env.SESSION_PASSWORD)
     client.on('error', function (err) {
