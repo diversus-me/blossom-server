@@ -36,6 +36,7 @@ export function loginLink (app, models, transporter) {
     }
   }), async (req, res) => {
     try {
+      console.log(req.session)
       const { email } = req.body
 
       const errors = validationResult(req)
@@ -80,6 +81,7 @@ export function loginLink (app, models, transporter) {
 export function login (app, models) {
   app.get('/api/login', async (req, res) => {
     try {
+      console.log(req.session)
       const token = req.query.token
 
       if (!token) {
