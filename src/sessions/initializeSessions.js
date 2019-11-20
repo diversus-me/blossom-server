@@ -30,7 +30,10 @@ export default function initializeSessions (app) {
       key: 'user_sid',
       resave: false,
       saveUninitialized: true,
-      cookie: { maxAge }
+      cookie: {
+        maxAge,
+        secure: true
+      }
     }))
   } else {
     store = null
