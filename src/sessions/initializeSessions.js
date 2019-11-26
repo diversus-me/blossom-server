@@ -6,8 +6,7 @@ const maxAge = 2629746000
 
 export default function initializeSessions (app) {
   let store = {}
-  console.log('DAS IST EINE KONSOLENAUSGABE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-  console.log(process.env.SESSION_HOST)
+  console.log(process.env.COOKIE_SECRET)
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
 
@@ -32,8 +31,8 @@ export default function initializeSessions (app) {
       saveUninitialized: true,
       cookie: {
         maxAge,
-        // secure: true,
-        httpOnly: true
+        secure: false
+        // httpOnly: true
       }
     }))
   } else {
