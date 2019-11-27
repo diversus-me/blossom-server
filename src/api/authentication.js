@@ -140,6 +140,7 @@ export function checkLogin (app, models) {
       return res.status(200).send({ message: 'Successfully signed in.', name: req.session.name, role: req.session.role, id: req.session.userID })
     } else {
       const { session } = req
+      console.log(session)
       if (!session.authenticated) {
         return res.status(403).send({ message: 'Not Logged In' })
       } else {
