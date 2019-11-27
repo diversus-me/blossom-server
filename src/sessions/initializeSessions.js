@@ -5,7 +5,7 @@ import redisStore from 'connect-redis'
 const maxAge = 2629746000
 
 export default function initializeSessions (app) {
-  let store = {}
+  let store = null
   console.log(process.env.COOKIE_SECRET)
   if (process.env.NODE_ENV === 'production') {
     const RedisStore = redisStore(session)
