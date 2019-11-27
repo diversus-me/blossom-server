@@ -25,8 +25,6 @@ postgres
     console.error('Unable to connect to the database:', err)
   })
 
-initializeSessions(app)
-
 /* Sync with Database */
 const models = initPostgres(postgres)
 app.use(cors({
@@ -39,6 +37,8 @@ app.use(cors({
     }
   }
 }))
+
+initializeSessions(app)
 
 app.use(express.json())
 app.use(express.urlencoded())
