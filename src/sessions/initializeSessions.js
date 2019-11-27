@@ -21,18 +21,20 @@ export default function initializeSessions (app) {
     client.on('error', function (err) {
       console.log('Redis Error ' + err)
     })
+    // store = new RedisStore({
+    //   client
+    // })
     app.use(session({
-      store: new RedisStore({
-        client
-      }),
+      store,
       secret: process.env.COOKIE_SECRET,
       key: 'user_sid',
       resave: false,
       saveUninitialized: true,
       cookie: {
+        domain: 'timfork.com',
         maxAge,
-        secure: true
-        // httpOnly: true
+        secure: true,
+        httpOnly: true
       }
     }))
   } else {
