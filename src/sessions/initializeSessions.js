@@ -32,8 +32,9 @@ export default function initializeSessions (app) {
       saveUninitialized: true,
       cookie: {
         maxAge,
-        secure: false,
-        httpOnly: false
+        secure: true,
+        sameSite: 'none',
+        httpOnly: true
       }
     }))
   } else {
