@@ -55,11 +55,11 @@ export default function defineAPI (app, models) {
   const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
 
   const upload = multer({
-    limits: { fieldSize: 25 * 1024 * 1024 }
+    limits: { fieldSize: 1024 * 1024 * 1024 }
   })
 
   app.post('/api/uploadLink', upload.single('video'), async (req, res) => {
-    fs.writeFile(req.body.fname + '.mkv', req.file.buffer, function (err) {
+    fs.writeFile(req.body.fileName + req.body.fileExtention, req.file.buffer, function (err) {
       if (err) {
         console.log('File Write:', err)
       } else {
@@ -67,7 +67,7 @@ export default function defineAPI (app, models) {
       }
 
       client.upload(
-        req.body.fname + '.mkv',
+        req.body.fileName + req.body.fileExtention,
         function (uri) {
           console.log('File upload completed. Your Vimeo URI is:', uri)
           res.status(200).send({ uri })
