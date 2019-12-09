@@ -7,12 +7,7 @@ import {
   createFlower, addNode, getFlowers, deleteFlower, getNode,
   editNode, editFlower, deleteNode
 } from './api/flower'
-import { getVideoMeta } from './api/video'
-
-import { Vimeo } from 'vimeo'
-import multer from 'multer'
-import fs from 'fs'
-import FileReader from 'filereader'
+import { getVideoMeta, uploadVideo } from './api/video'
 
 function checkAuth (req, res, next) {
   if (req.session.authenticated) {
@@ -33,6 +28,7 @@ function checkAdmin (req, res, next) {
 export default function defineAPI (app, models) {
   getFlowers(app, models)
   getVideoMeta(app, models)
+  uploadVideo(app)
 
   const tranporter = generateTransporter()
   checkLogin(app, models)
@@ -51,36 +47,4 @@ export default function defineAPI (app, models) {
   getNode(app, models)
   editNode(app, models, checkAuth)
   deleteNode(app, models, checkAuth)
-
-  const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
-
-  const upload = multer({
-    limits: { fieldSize: 1024 * 1024 * 1024 }
-  })
-
-  app.post('/api/uploadLink', upload.single('video'), async (req, res) => {
-    const videoRef = `../videoFiles/${req.body.fileName}`
-    fs.writeFile(videoRef, req.file.buffer, function (err) {
-      if (err) {
-        console.log('File Write:', err)
-      } else {
-        console.log('Successfully written File', err)
-      }
-
-      client.upload(
-        videoRef,
-        function (uri) {
-          console.log('File upload completed. Your Vimeo URI is:', uri)
-          res.status(200).send({ uri })
-        },
-        function (bytesUploaded, bytesTotal) {
-          var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2)
-          console.log(bytesUploaded, bytesTotal, percentage + '%')
-        },
-        function (error) {
-          console.log('Failed because: ' + error)
-        }
-      )
-    })
-  })
 }
