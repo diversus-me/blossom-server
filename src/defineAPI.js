@@ -59,7 +59,8 @@ export default function defineAPI (app, models) {
   })
 
   app.post('/api/uploadLink', upload.single('video'), async (req, res) => {
-    fs.writeFile(req.body.fileName, req.file.buffer, function (err) {
+    const videoRef = `../videoFiles/${req.body.fileName}`
+    fs.writeFile(videoRef, req.file.buffer, function (err) {
       if (err) {
         console.log('File Write:', err)
       } else {
@@ -67,7 +68,7 @@ export default function defineAPI (app, models) {
       }
 
       client.upload(
-        req.body.fileName,
+        videoRef,
         function (uri) {
           console.log('File upload completed. Your Vimeo URI is:', uri)
           res.status(200).send({ uri })
