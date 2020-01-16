@@ -6,7 +6,7 @@ import fs from 'fs'
 const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
 
 const upload = multer({
-  limits: { fieldSize: 1024 * 1024 * 1024 }
+  limits: { fieldSize: 1024 * 1024 * 1024 * 1024 }
 })
 
 export function uploadVideo (app) {
