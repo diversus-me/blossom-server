@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 import express from 'express'
 import cors from 'cors'
+import fetch from 'node-fetch'
 
 import { hosts } from './hosts'
 import connectPostgres from './postgres/connectPostgres'
@@ -49,3 +50,21 @@ defineAPI(app, models)
 app.listen(PORT, () => {
   console.log(`Server listening in at port ${PORT}.`)
 })
+
+// console.log(process.env.AUTH_TOKEN)
+
+// fetch('https://auth.serv.timz.io/auth/graphql', {
+//   method: 'POST',
+//   // body: 'query { user(id: 6) { id name username email_verified }}',
+//   body: JSON.stringify({ query: '{ user(id: 6) { id name username email_verified }}' }),
+//   headers: {
+//     Authorization: 'Bearer ' + process.env.AUTH_TOKEN,
+//     'Content-Type': 'application/json'
+//   }
+// })
+//   // .then(response => console.log(response))
+//   .then(response => response.json())
+//   .then(json => console.log(json))
+//   .catch(e => console.log(e))
+
+// console.log(new Date(1579625667))
