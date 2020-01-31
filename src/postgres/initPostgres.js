@@ -104,8 +104,8 @@ export default function initDatabase (database) {
     }
   })
 
-  // database.sync({ force: true })
-  database.sync()
+  database.sync({ force: true })
+  // database.sync()
 
   Flower.belongsTo(Node)
 
