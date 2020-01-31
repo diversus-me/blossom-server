@@ -8,7 +8,11 @@ export default function connectPostgres () {
     {
       host: process.env.RDS_HOSTNAME,
       port: process.env.RDS_PORT,
-      dialect: 'postgres'
+      dialect: 'postgres',
+      dialectOptions: {
+        ssl: process.env.RDS_SSL === 'true'
+      },
+      logging: false
     }
   )
 }

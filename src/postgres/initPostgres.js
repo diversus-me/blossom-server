@@ -1,31 +1,11 @@
 import Sequelize from 'sequelize'
 
 export default function initDatabase (database) {
-  const User = database.define('user', {
-    name: {
-      type: Sequelize.STRING,
-      allowNull: false
-    },
-    email: {
-      type: Sequelize.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true
-      }
-    },
-    joined: {
-      type: Sequelize.DATE,
-      defaultValue: Sequelize.NOW
-    },
-    role: {
-      type: Sequelize.STRING,
-      defaultValue: 'user',
-      allowNull: false
-    }
-  })
-
   const Flower = database.define('flower', {
+    user: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
     title: {
       type: Sequelize.STRING,
       allowNull: false
@@ -41,9 +21,17 @@ export default function initDatabase (database) {
   })
 
   const Node = database.define('node', {
+    user: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
     title: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    description: {
+      type: Sequelize.TEXT,
+      allowNull: true
     },
     created: {
       type: Sequelize.DATE,
@@ -52,6 +40,10 @@ export default function initDatabase (database) {
   })
 
   const Video = database.define('video', {
+    user: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
     url: {
       type: Sequelize.STRING,
       allowNull: false
@@ -71,6 +63,10 @@ export default function initDatabase (database) {
   })
 
   const Connection = database.define('connection', {
+    user: {
+      type: Sequelize.STRING,
+      allowNull: false
+    },
     sourceIn: {
       type: Sequelize.INTEGER,
       allowNull: false
@@ -94,31 +90,34 @@ export default function initDatabase (database) {
     flavor: {
       type: Sequelize.STRING,
       allowNull: false
+    },
+    claps: {
+      type: Sequelize.INTEGER,
+      allowNull: false
+    }
+  })
+
+  const Permission = database.define('permission', {
+    user: {
+      type: Sequelize.STRING,
+      allowNull: false
     }
   })
 
   // database.sync({ force: true })
   database.sync()
 
-  Flower.belongsTo(User)
   Flower.belongsTo(Node)
 
-  Node.belongsTo(User)
   Node.belongsTo(Video)
   Node.hasMany(Connection, { as: 'connections' })
 
   Connection.belongsTo(Node)
   Connection.belongsTo(Node, { as: 'targetNode' })
-  Connection.belongsTo(User)
-
-  Video.belongsTo(User)
-
-  User.hasMany(Node, { as: 'Nodes' })
-  User.hasMany(Flower, { as: 'Flowers' })
-  User.hasMany(Video, { as: 'Videos' })
-  User.hasMany(Connection, { as: 'Connections' })
+  Permission.belongsTo(Flower)
 
   database.sync()
+  // database.sync({ force: true })
 
-  return { Flower, Node, Connection, User, Video }
+  return { Flower, Node, Connection, Video, Permission }
 }

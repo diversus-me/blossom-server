@@ -9,29 +9,18 @@ export function getFlowers (app, models) {
   app.get('/api/allFlowers', async (req, res) => {
     try {
       const flowers = await models.Flower.findAll({
-        attributes: ['title', 'description', 'created', 'id'],
-        include: [{
-          model: models.User,
-          attributes: ['id', 'name']
-        },
-        {
-          model: models.Node,
-          attributes: ['id'],
-          include: [{
-            model: models.Video,
-            attributes: ['url', 'type', 'uploaded', 'duration']
-          }]
-        }
+        attributes: ['title', 'description', 'created', 'id', 'user'],
+        include: [
+          {
+            model: models.Node,
+            attributes: ['id'],
+            include: [{
+              model: models.Video,
+              attributes: ['url', 'type', 'uploaded', 'duration']
+            }]
+          }
         ]
       })
-      // const node = await models.Connection.findAll({
-      //   where: {
-      //     id: req.params.uid
-      //   },
-      //   attributes: [
-      //     'created', 'flavor', 'id', 'sourceIn', 'sourceOut', 'targetIn', 'targetOut'
-      //   ]
-      // })
 
       return res.status(200).send({ data: flowers })
     } catch (error) {
@@ -49,16 +38,13 @@ export function getNode (app, models) {
           id: req.params.uid
         },
         attributes: [
-          'id', 'title', 'created'
+          'id', 'title', 'created', 'user'
         ],
-        include: [{
-          model: models.User,
-          attributes: ['id', 'name']
-        },
-        {
-          model: models.Video,
-          attributes: ['url', 'type', 'uploaded', 'duration']
-        }]
+        include: [
+          {
+            model: models.Video,
+            attributes: ['url', 'type', 'uploaded', 'duration']
+          }]
       })
 
       if (!node) {
@@ -72,15 +58,11 @@ export function getNode (app, models) {
         include: [{
           model: models.Node,
           as: 'targetNode',
-          attributes: ['id', 'created', 'title'],
+          attributes: ['id', 'created', 'title', 'user'],
           include: [{
             model: models.Video,
             attributes: ['url', 'type', 'uploaded', 'duration']
           }]
-        },
-        {
-          model: models.User,
-          attributes: ['id', 'name']
         }]
       })
 
@@ -95,8 +77,8 @@ export function getNode (app, models) {
   })
 }
 
-export function deleteFlower (app, models, checkAuth) {
-  app.delete('/api/flower', checkAuth, checkSchema({
+export function deleteFlower (app, models, checkToken) {
+  app.delete('/api/flower', checkToken, checkSchema({
     id: {
       isNumeric: {
         errorMessage: 'id is not a number'
@@ -125,7 +107,7 @@ export function deleteFlower (app, models, checkAuth) {
         return res.status(404).send('Flower does not exist')
       }
 
-      if (req.session.userID !== flower.get('userId') && req.session.role !== 'admin') {
+      if (req.token.sub !== flower.get('user') && req.session.role !== 'admin') {
         return res.status(403).send('Not allowed.')
       }
 
@@ -146,8 +128,8 @@ export function deleteFlower (app, models, checkAuth) {
   })
 }
 
-export function editFlower (app, models, checkAuth) {
-  app.patch('/api/flower', checkAuth, checkSchema({
+export function editFlower (app, models, checkToken) {
+  app.patch('/api/flower', checkToken, checkSchema({
     id: {
       isNumeric: {
         errorMessage: 'id is not a number'
@@ -190,7 +172,7 @@ export function editFlower (app, models, checkAuth) {
         return res.status(404).send('Flower does not exist')
       }
 
-      if (req.session.userID !== flower.get('userId') && req.session.role !== 'admin') {
+      if (req.token.sub !== flower.get('user') && req.session.role !== 'admin') {
         return res.status(403).send('Not allowed.')
       }
 
@@ -210,8 +192,8 @@ export function editFlower (app, models, checkAuth) {
   })
 }
 
-export function createFlower (app, models, checkAuth) {
-  app.post('/api/flower', checkAuth, checkSchema({
+export function createFlower (app, models, checkToken) {
+  app.post('/api/flower', checkToken, checkSchema({
     title: {
       isString: {
         errorMessage: 'Title is not a string'
@@ -219,6 +201,15 @@ export function createFlower (app, models, checkAuth) {
       isEmpty: {
         negated: true,
         errorMessage: 'Title is empty'
+      }
+    },
+    duration: {
+      isInt: {
+        errorMessage: 'Duration is not a integer'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'duration is empty'
       }
     },
     description: {
@@ -235,7 +226,7 @@ export function createFlower (app, models, checkAuth) {
         errorMessage: 'Type is empty'
       },
       custom: {
-        options: value => (value === 'youtube'),
+        options: value => (value === 'vimeo'),
         errorMessage: 'Type is not supported'
       }
     },
@@ -263,44 +254,45 @@ export function createFlower (app, models, checkAuth) {
         return res.status(422).jsonp(errors.array())
       }
 
-      const { title, description, type, link } = req.body
-      const user = await models.User.findOne({
-        where: {
-          id: req.session.userID
-        }
-      })
+      const { title, description, type, link, duration } = req.body
+
+      const user = req.token.sub
+
       if (!user) {
         return res.status(404).send('User not found.')
       }
 
+      // const vidId = getVideoId(link).id
+      // const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
+      // const body = await checkStatus(response)
+
+      // if (!body.items[0]) {
+      //   return res.status(422).send('Video not found')
+      // }
       const vidId = getVideoId(link).id
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-      const body = await checkStatus(response)
+      // const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      // const json = await response.json()
 
-      if (!body.items[0]) {
-        return res.status(422).send('Video not found')
-      }
-
-      const duration = body.items[0].contentDetails.duration
-      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      // const duration = json[0].duration
       const video = await models.Video.create({
         type,
-        userId: user.get('id'),
+        user,
         url: vidId,
-        duration: parsedDuration
+        duration
       })
 
       const node = await models.Node.create({
         title,
+        description,
         videoId: video.get('id'),
-        userId: user.get('id'),
+        user,
         created: new Date()
       })
 
       const flower = await models.Flower.create({
         title,
         description,
-        userId: user.get('id'),
+        user,
         nodeId: node.get('id'),
         created: new Date()
       })
@@ -317,8 +309,8 @@ export function createFlower (app, models, checkAuth) {
   })
 }
 
-export function addNode (app, models, checkAuth) {
-  app.post('/api/node', checkAuth, checkSchema({
+export function addNode (app, models, checkToken) {
+  app.post('/api/node', checkToken, checkSchema({
     id: {
       isInt: {
         errorMessage: 'ID is not an integer.'
@@ -328,7 +320,25 @@ export function addNode (app, models, checkAuth) {
         errorMessage: 'ID not specified.'
       }
     },
+    duration: {
+      isInt: {
+        errorMessage: 'Duration is not a integer'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'duration is empty'
+      }
+    },
     title: {
+      isString: {
+        errorMessage: 'Title is not a string.'
+      },
+      isEmpty: {
+        negated: true,
+        errorMessage: 'Title not specified.'
+      }
+    },
+    description: {
       isString: {
         errorMessage: 'Title is not a string.'
       },
@@ -346,7 +356,7 @@ export function addNode (app, models, checkAuth) {
         errorMessage: 'Type is empty'
       },
       custom: {
-        options: value => (value === 'youtube'),
+        options: value => (value === 'vimeo'),
         errorMessage: 'Type is not supported'
       }
     },
@@ -419,39 +429,31 @@ export function addNode (app, models, checkAuth) {
         return res.status(422).jsonp(errors.array())
       }
 
-      const { id, title, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
+      const { id, title, description, duration, type, link, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
 
-      const user = await models.User.findOne({
-        where: {
-          id: req.session.userID
-        }
-      })
+      const user = req.token.sub
 
       if (!user) {
         return res.status(404).send('User not found.')
       }
 
       const vidId = getVideoId(link).id
-      const response = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${vidId}&key=${process.env.YOUTUBE_API_KEY}`)
-      const body = await checkStatus(response)
+      // const response = await fetch('http://vimeo.com/api/v2/video/' + vidId + '.json')
+      // const json = await response.json()
 
-      if (!body.items[0]) {
-        return res.status(422).send('Video not found')
-      }
-
-      const duration = body.items[0].contentDetails.duration
-      const parsedDuration = moment.duration(duration).format('s', { trim: false, useGrouping: false })
+      // const duration = json[0].duration
       const video = await models.Video.create({
         type,
-        userId: user.get('id'),
+        user,
         url: vidId,
-        duration: parsedDuration
+        duration
       })
 
       const node = await models.Node.create({
         title,
+        description,
         videoId: video.get('id'),
-        userId: user.get('id'),
+        user,
         created: new Date()
       })
 
@@ -461,7 +463,8 @@ export function addNode (app, models, checkAuth) {
         targetIn,
         targetOut,
         flavor,
-        userId: user.get('id'),
+        claps: 0,
+        user,
         targetNodeId: node.get('id'),
         nodeId: id,
         created: new Date()
@@ -479,8 +482,8 @@ export function addNode (app, models, checkAuth) {
   })
 }
 
-export function editNode (app, models, checkAuth) {
-  app.patch('/api/node', checkAuth, checkSchema({
+export function editNode (app, models, checkToken) {
+  app.patch('/api/node', checkToken, checkSchema({
     id: {
       isInt: {
         errorMessage: 'ID is not an integer.'
@@ -553,7 +556,7 @@ export function editNode (app, models, checkAuth) {
       }
 
       const { id, title, sourceIn, sourceOut, targetIn, targetOut, flavor } = req.body
-      console.log(id)
+
       const node = await models.Node.findOne({
         where: {
           id
@@ -564,7 +567,9 @@ export function editNode (app, models, checkAuth) {
         return res.status(404).send('Node does not exist')
       }
 
-      if (req.session.userID !== node.get('userId') && req.session.role !== 'admin') {
+      const user = req.token.sub
+
+      if (user !== node.get('user') && req.session.role !== 'admin') {
         return res.status(403).send('Not allowed.')
       }
 
@@ -575,13 +580,13 @@ export function editNode (app, models, checkAuth) {
       if (!nodeUpdated) {
         return res.status(500).send('Node could not be updated')
       }
-      console.log(id)
+
       const connection = await models.Connection.findOne({
         where: {
           targetNodeId: id
         }
       })
-      console.log(connection)
+
       if (!connection) {
         return res.status(404).send('Connection does not exist')
       }
@@ -606,8 +611,8 @@ export function editNode (app, models, checkAuth) {
   })
 }
 
-export function deleteNode (app, models, checkAuth) {
-  app.delete('/api/node', checkAuth, checkSchema({
+export function deleteNode (app, models, checkToken) {
+  app.delete('/api/node', checkToken, checkSchema({
     id: {
       isInt: {
         errorMessage: 'ID is not an integer.'
@@ -637,7 +642,9 @@ export function deleteNode (app, models, checkAuth) {
         return res.status(404).send('Flower does not exist')
       }
 
-      if (req.session.userID !== node.get('userId') && req.session.role !== 'admin') {
+      const user = req.token.sub
+
+      if (user !== node.get('user') && req.session.role !== 'admin') {
         return res.status(403).send('Not allowed.')
       }
 

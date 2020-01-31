@@ -1,63 +1,33 @@
-import { createUser, deleteUser, getUsers } from './api/user'
-import {
-  loginLink, login, checkLogin,
-  generateTransporter, logout
-} from './api/authentication'
+// import { createUser, deleteUser, getUsers } from './api/user'
+import { checkLogin, checkToken, checkAdmin } from './api/authentication'
 import {
   createFlower, addNode, getFlowers, deleteFlower, getNode,
   editNode, editFlower, deleteNode
 } from './api/flower'
-import { getVideoMeta } from './api/video'
-// import { uppyCompanion, uppyRequest, confirmVideoConversion } from './uppy'
-// import { getPresignedUploadUrl } from './s3/s3'
-
-function checkAuth (req, res, next) {
-  if (req.session.authenticated) {
-    next()
-  } else {
-    return res.status(403).send()
-  }
-}
-
-function checkAdmin (req, res, next) {
-  if (req.session.role && req.session.role === 'admin') {
-    next()
-  } else {
-    return res.status(403).send()
-  }
-}
+import { uploadVideo } from './api/video'
 
 export default function defineAPI (app, models) {
+  app.get('/api/test', checkToken, checkAdmin,
+    async (req, res) => {
+      console.log(req.token)
+      res.send(200)
+    }
+  )
+
   getFlowers(app, models)
-  getVideoMeta(app, models)
+  uploadVideo(app)
 
-  const tranporter = generateTransporter()
-  checkLogin(app, models)
-  loginLink(app, models, tranporter)
-  login(app, models)
-  logout(app, models)
+  checkLogin(app)
 
-  getUsers(app, models, checkAuth, checkAdmin)
-  createUser(app, models, checkAuth, checkAdmin)
-  deleteUser(app, models, checkAuth, checkAdmin)
+  // getUsers(app, models, checkToken, checkAdmin)
+  // createUser(app, models, checkToken, checkAdmin)
+  // deleteUser(app, models, checkToken, checkAdmin)
 
-  createFlower(app, models, checkAuth)
-  deleteFlower(app, models, checkAuth)
-  editFlower(app, models, checkAuth)
-  addNode(app, models, checkAuth)
+  createFlower(app, models, checkToken)
+  deleteFlower(app, models, checkToken)
+  editFlower(app, models, checkToken)
+  addNode(app, models, checkToken)
   getNode(app, models)
-  editNode(app, models, checkAuth)
-  deleteNode(app, models, checkAuth)
-
-  // uppyCompanion(app, models, checkAuth)
-  // uppyRequest(app, models, checkAuth)
-  // confirmVideoConversion(app, models)
-  // app.get('/api/uploadLink', async (req, res) => {
-  //   try {
-  //     const url = await getPresignedUploadUrl(`testfile${Math.random() * 1000}00`)
-  //     res.status(200).send({ url })
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // })
+  editNode(app, models, checkToken)
+  deleteNode(app, models, checkToken)
 }

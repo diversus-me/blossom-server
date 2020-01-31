@@ -1,20 +1,17 @@
-import fetch from 'node-fetch'
-import moment from 'moment'
-import momentDurationFormat from 'moment-duration-format'
 
 import { Vimeo } from 'vimeo'
 import multer from 'multer'
-import fs from 'fs' // eslint-disable-line no-unused-vars
-const getVideoId = require('get-video-id')
+import fs from 'fs'
+
+const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
 
 const upload = multer({
-  limits: { fieldSize: 1024 * 1024 * 1024 }
+  limits: { fieldSize: 1024 * 1024 * 1024 * 1024 }
 })
 
 export function uploadVideo (app) {
-  const client = new Vimeo(process.env.VIMEO_CLIENT_ID, process.env.VIMEO_CLIENT_SECRET, process.env.VIMEO_TOKEN)
   app.post('/api/uploadVideo', upload.single('video'), async (req, res) => {
-    const videoRef = `../videoFiles/${req.body.fileName}`
+    const videoRef = `../../videoFiles/${req.body.fileName}`
     fs.writeFile(videoRef, req.file.buffer, function (err) {
       if (err) {
         console.log('File Write Error:', err)
