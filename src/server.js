@@ -4,12 +4,10 @@ if (process.env.NODE_ENV !== 'production') {
 }
 import express from 'express'
 import cors from 'cors'
-import fetch from 'node-fetch'
 
 import { hosts } from './hosts'
 import connectPostgres from './postgres/connectPostgres'
 import initPostgres from './postgres/initPostgres'
-import initializeSessions from './sessions/initializeSessions'
 import defineAPI from './defineAPI'
 
 const PORT = process.env.HTTP_PORT || 8081
@@ -38,8 +36,6 @@ app.use(cors({
     }
   }
 }))
-
-initializeSessions(app)
 
 app.use(express.json())
 app.use(express.urlencoded())

@@ -11,7 +11,7 @@ const upload = multer({
 
 export function uploadVideo (app) {
   app.post('/api/uploadVideo', upload.single('video'), async (req, res) => {
-    const videoRef = `../videoFiles/${req.body.fileName}`
+    const videoRef = `../../videoFiles/${req.body.fileName}`
     fs.writeFile(videoRef, req.file.buffer, function (err) {
       if (err) {
         console.log('File Write Error:', err)
