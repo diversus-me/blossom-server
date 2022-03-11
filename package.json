@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.6.0",
-    "@uppy/companion": "^1.4.0",
+    "@uppy/companion": "^3.3.1",
     "aws-sdk": "^2.533.0",
     "babel-loader": "^8.0.6",
     "connect-dynamodb": "^2.0.3",
