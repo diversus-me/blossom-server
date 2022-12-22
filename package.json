@@ -24,7 +24,7 @@
     "express-session": "^1.16.2",
     "express-validator": "^6.2.0",
     "get-video-id": "^3.1.4",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.24.0",
     "moment-duration-format": "^2.3.2",
     "node-fetch": "^2.6.0",
